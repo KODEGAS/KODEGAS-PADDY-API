@@ -1,11 +1,5 @@
 """
 Rice Disease Detection API
-----------------------------
-A FastAPI-based service for:
-- Predicting rice diseases from leaf/panicle images using a pre-trained deep learning model.
-- Providing detailed disease information and recommended treatments (medicines).
-
-Endpoints:
   - /health               : Health check
   - /classes              : List all detectable disease classes
   - /info                 : Model input/output metadata
@@ -13,11 +7,6 @@ Endpoints:
   - /disease-info         : List all diseases or get info about a specific one
   - /disease-medicines    : Get recommended treatments for a given disease
 
-Dependencies:
-  - FastAPI
-  - TensorFlow/Keras
-  - Pillow (PIL)
-  - Uvicorn
 """
 
 from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException
@@ -29,9 +18,6 @@ import json
 import uvicorn
 from typing import List, Dict, Any
 
-# ===========================
-# Initialize FastAPI App
-# ===========================
 app = FastAPI(
     title="Rice Disease Detection API",
     description=(
@@ -49,17 +35,14 @@ app = FastAPI(
     },
 )
 
-# ===========================
-# Configuration & Constants
-# ===========================
+
 MODEL_PATH = "mymodel"  # Path to trained Keras model (HDF5 or SavedModel format)
 LABELS_FILE = "labels.txt"  # Class labels (e.g., '0 bacterial_panicle_blight')
 DISEASE_INFO_FILE = "disease_info.json"  # Disease descriptions, symptoms, prevention
 DISEASE_MEDICINES_FILE = "disease_medicines.json"  # Treatment recommendations
 
-# ===========================
-# Load Model and Data
-# ===========================
+
+
 try:
     model = tf.keras.models.load_model(MODEL_PATH)
     print(f"[INFO] Model loaded successfully from {MODEL_PATH}")
@@ -88,9 +71,6 @@ except Exception as e:
     raise RuntimeError(f"Failed to load medicine data from {DISEASE_MEDICINES_FILE}: {e}")
 
 
-# ===========================
-# API Endpoints
-# ===========================
 
 @app.get("/health", tags=["Health"])
 def health_check():
