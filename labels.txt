@@ -1,0 +1,10 @@
+0 bacterial_panicle_blight
+1 downey_mildew
+2 dead_heart
+3 bacterial_leaf_blight
+4 brown_spot
+5 normal
+6 hispa
+7 tungro
+8 blast
+9 bacterial_leaf_streak

@@ -1,0 +1,291 @@
+{
+    "bacterial_panicle_blight": [
+        {
+            "name": "Copper Oxychloride 50% WP",
+            "brand": "AgroShield",
+            "type": "Bactericide/Fungicide",
+            "active_ingredient": "Copper Oxychloride",
+            "pack_size": "500g",
+            "price": "Rs. 800",
+            "image_url": "https://example.com/images/copper_oxychloride.jpg",
+            "application_rate": "2g per liter of water",
+            "method": "Foliar spray during early boot stage",
+            "frequency": "1–2 applications, 7 days apart",
+            "availability": "Widely available at agro-shops across dry and intermediate zones",
+            "priority": 1,
+            "note": "Avoid use in copper-sensitive soils. Do not mix with acidic pesticides."
+        },
+        {
+            "name": "Streptomycin Sulphate 17% WP",
+            "brand": "BioCare Strepto",
+            "type": "Antibiotic Bactericide",
+            "active_ingredient": "Streptomycin Sulphate",
+            "pack_size": "100g",
+            "price": "Rs. 1500",
+            "image_url": "https://example.com/images/streptomycin.jpg",
+            "application_rate": "1g per 10L water",
+            "method": "Spray at panicle initiation if symptoms appear",
+            "frequency": "Single application recommended",
+            "availability": "Available in larger agro outlets; limited stock in rural areas",
+            "priority": 2,
+            "note": "Use with caution – antibiotic resistance is a concern. Not for organic farming."
+        }
+    ],
+    "downey_mildew": [
+        {
+            "name": "Mancozeb 75% WP",
+            "brand": "Fungichem",
+            "type": "Protective Fungicide",
+            "active_ingredient": "Mancozeb",
+            "pack_size": "500g",
+            "price": "Rs. 900",
+            "image_url": "https://example.com/images/mancozeb.jpg",
+            "application_rate": "2g per liter of water",
+            "method": "Spray before expected rainfall or humidity spikes",
+            "frequency": "Apply every 7–10 days during high-risk periods",
+            "availability": "Commonly available nationwide",
+            "priority": 1,
+            "note": "Preventive use is key. Apply early; ineffective on advanced infections."
+        },
+        {
+            "name": "Metalaxyl 8% + Mancozeb 64% WP",
+            "brand": "Ridomil Gold",
+            "type": "Systemic Fungicide",
+            "active_ingredient": "Metalaxyl + Mancozeb",
+            "pack_size": "500g",
+            "price": "Rs. 1200",
+            "image_url": "https://example.com/images/ridomil_gold.jpg",
+            "application_rate": "1.5g per liter of water",
+            "method": "Foliar spray at first sign of white downy growth",
+            "frequency": "One application, repeat only if needed after 10 days",
+            "availability": "Available in major towns and agricultural supply centers",
+            "priority": 2,
+            "note": "More effective than Mancozeb alone, but higher cost. Use sparingly to prevent resistance."
+        }
+    ],
+    "dead_heart": [
+        {
+            "name": "Chlorpyrifos 20% EC",
+            "brand": "PestGuard",
+            "type": "Organophosphate Insecticide",
+            "active_ingredient": "Chlorpyrifos",
+            "pack_size": "500ml",
+            "price": "Rs. 700",
+            "image_url": "https://example.com/images/chlorpyrifos.jpg",
+            "application_rate": "2ml per liter of water",
+            "method": "Spray during evening to target stem borer moths",
+            "frequency": "One application at early infestation, monitor after 7 days",
+            "availability": "Widely available but under regulatory review due to toxicity",
+            "priority": 1,
+            "note": "Highly toxic. Wear full PPE. Avoid spraying near water bodies."
+        },
+        {
+            "name": "Quinalphos 25% EC",
+            "brand": "InsectoMax",
+            "type": "Insecticide",
+            "active_ingredient": "Quinalphos",
+            "pack_size": "500ml",
+            "price": "Rs. 800",
+            "image_url": "https://example.com/images/quinalphos.jpg",
+            "application_rate": "1.5ml per liter of water",
+            "method": "Spray during late evening; focus on plant base",
+            "frequency": "Single application unless reinfestation occurs",
+            "availability": "Available in most agro stores",
+            "priority": 2,
+            "note": "Effective against early larval stages. Avoid use during flowering."
+        }
+    ],
+    "bacterial_leaf_blight": [
+        {
+            "name": "Copper Hydroxide 77% WP",
+            "brand": "CopperSafe",
+            "type": "Bactericide",
+            "active_ingredient": "Copper Hydroxide",
+            "pack_size": "500g",
+            "price": "Rs. 850",
+            "image_url": "https://example.com/images/copper_hydroxide.jpg",
+            "application_rate": "1.5g per liter of water",
+            "method": "Foliar spray at first appearance of V-shaped lesions",
+            "frequency": "One to two sprays, 7 days apart",
+            "availability": "Common in wet and dry zone agro-shops",
+            "priority": 1,
+            "note": "Best used preventively. Do not exceed recommended dose to avoid phytotoxicity."
+        },
+        {
+            "name": "Kasugamycin 5% WP",
+            "brand": "Kasumin",
+            "type": "Antibiotic Bactericide",
+            "active_ingredient": "Kasugamycin",
+            "pack_size": "250g",
+            "price": "Rs. 1100",
+            "image_url": "https://example.com/images/kasugamycin.jpg",
+            "application_rate": "2g per 10L water",
+            "method": "Spray during early boot stage if disease pressure is high",
+            "frequency": "Single application",
+            "availability": "Limited availability; order in advance",
+            "priority": 2,
+            "note": "Highly effective but expensive. Recommended for high-value crops or severe outbreaks."
+        }
+    ],
+    "brown_spot": [
+        {
+            "name": "Tricyclazole 75% WP",
+            "brand": "BASF BlastX",
+            "type": "Fungicide",
+            "active_ingredient": "Tricyclazole",
+            "pack_size": "250g",
+            "price": "Rs. 1200",
+            "image_url": "https://example.com/images/tricyclazole.jpg",
+            "application_rate": "1g per liter of water",
+            "method": "Spray at booting or early flowering stage",
+            "frequency": "One application usually sufficient",
+            "availability": "Available in major agricultural zones",
+            "priority": 1,
+            "note": "Also effective against blast. Ideal for preventive use in high-humidity areas."
+        },
+        {
+            "name": "Isoprothiolane 40% EC",
+            "brand": "AgroPro Isoxil",
+            "type": "Systemic Fungicide",
+            "active_ingredient": "Isoprothiolane",
+            "pack_size": "100ml",
+            "price": "Rs. 950",
+            "image_url": "https://example.com/images/isoprothiolane.jpg",
+            "application_rate": "1ml per 10L water",
+            "method": "Foliar spray during grain filling stage",
+            "frequency": "One application",
+            "availability": "Moderate availability; more common in commercial farming regions",
+            "priority": 2,
+            "note": "Provides long-lasting protection. Compatible with integrated pest management (IPM)."
+        }
+    ],
+    "normal": [],
+    "hispa": [
+        {
+            "name": "Chlorpyrifos 20% EC",
+            "brand": "PestGuard",
+            "type": "Insecticide",
+            "active_ingredient": "Chlorpyrifos",
+            "pack_size": "500ml",
+            "price": "Rs. 700",
+            "image_url": "https://example.com/images/chlorpyrifos.jpg",
+            "application_rate": "2ml per liter of water",
+            "method": "Spray upper leaf surfaces thoroughly in evening",
+            "frequency": "One spray if infestation is moderate",
+            "availability": "Widely available",
+            "priority": 1,
+            "note": "Hispa beetles are active during day; evening spray increases contact kill."
+        },
+        {
+            "name": "Quinalphos 25% EC",
+            "brand": "InsectoMax",
+            "type": "Insecticide",
+            "active_ingredient": "Quinalphos",
+            "pack_size": "500ml",
+            "price": "Rs. 800",
+            "image_url": "https://example.com/images/quinalphos.jpg",
+            "application_rate": "1.5ml per liter of water",
+            "method": "Spray at early morning or late evening",
+            "frequency": "Single application",
+            "availability": "Available in most agro outlets",
+            "priority": 2,
+            "note": "Rotate with other chemicals to prevent resistance development."
+        }
+    ],
+    "tungro": [
+        {
+            "name": "Imidacloprid 17.8% SL",
+            "brand": "Bayer Confidor",
+            "type": "Systemic Insecticide",
+            "active_ingredient": "Imidacloprid",
+            "pack_size": "50ml",
+            "price": "Rs. 300",
+            "image_url": "https://example.com/images/confidor.jpg",
+            "application_rate": "1ml per 10L water",
+            "method": "Soil drench or early foliar spray to control green leafhoppers",
+            "frequency": "Apply at nursery stage and transplanting",
+            "availability": "Very common and trusted brand",
+            "priority": 1,
+            "note": "Most effective when applied early. Protects young plants from vector transmission."
+        },
+        {
+            "name": "Thiamethoxam 25% WG",
+            "brand": "Syngenta Actara",
+            "type": "Neonicotinoid Insecticide",
+            "active_ingredient": "Thiamethoxam",
+            "pack_size": "50g",
+            "price": "Rs. 400",
+            "image_url": "https://example.com/images/actara.jpg",
+            "application_rate": "1g per 15L water",
+            "method": "Seed treatment or early foliar spray",
+            "frequency": "Single application at nursery stage",
+            "availability": "Available in urban and semi-urban agro stores",
+            "priority": 2,
+            "note": "Excellent for vector control. Avoid overuse to protect beneficial insects."
+        }
+    ],
+    "blast": [
+        {
+            "name": "Tricyclazole 75% WP",
+            "brand": "BASF BlastX",
+            "type": "Rice Blast Fungicide",
+            "active_ingredient": "Tricyclazole",
+            "pack_size": "250g",
+            "price": "Rs. 1200",
+            "image_url": "https://example.com/images/tricyclazole.jpg",
+            "application_rate": "1g per liter of water",
+            "method": "Spray at booting stage – critical for neck blast prevention",
+            "frequency": "One preventive spray is usually sufficient",
+            "availability": "Highly recommended and stocked in blast-prone areas",
+            "priority": 1,
+            "note": "Do not wait for symptoms. Proactive spraying is most effective."
+        },
+        {
+            "name": "Isoprothiolane 40% EC",
+            "brand": "AgroPro Isoxil",
+            "type": "Systemic Fungicide",
+            "active_ingredient": "Isoprothiolane",
+            "pack_size": "100ml",
+            "price": "Rs. 950",
+            "image_url": "https://example.com/images/isoprothiolane.jpg",
+            "application_rate": "1ml per 10L water",
+            "method": "Foliar spray during panicle development",
+            "frequency": "Single application",
+            "availability": "Available in commercial farming regions",
+            "priority": 2,
+            "note": "Long residual activity. Good alternative to rotate with Tricyclazole."
+        }
+    ],
+    "bacterial_leaf_streak": [
+        {
+            "name": "Copper Oxychloride 50% WP",
+            "brand": "AgroShield",
+            "type": "Bactericide",
+            "active_ingredient": "Copper Oxychloride",
+            "pack_size": "500g",
+            "price": "Rs. 800",
+            "image_url": "https://example.com/images/copper_oxychloride.jpg",
+            "application_rate": "2g per liter of water",
+            "method": "Foliar spray at early symptom stage",
+            "frequency": "One to two sprays, 7 days apart",
+            "availability": "Widely available",
+            "priority": 1,
+            "note": "Best used preventively during rainy seasons when disease spreads via water splash."
+        },
+        {
+            "name": "Kasugamycin 5% WP",
+            "brand": "Kasumin",
+            "type": "Antibiotic Bactericide",
+            "active_ingredient": "Kasugamycin",
+            "pack_size": "250g",
+            "price": "Rs. 1100",
+            "image_url": "https://example.com/images/kasugamycin.jpg",
+            "application_rate": "2g per 10L water",
+            "method": "Spray during boot stage if disease pressure is high",
+            "frequency": "Single application",
+            "availability": "Limited; order in advance",
+            "priority": 2,
+            "note": "Highly effective but costly. Use only in severe cases or seed multiplication fields."
+        }
+    ]
+}

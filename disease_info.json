@@ -1,0 +1,215 @@
+{
+    "bacterial_panicle_blight": {
+        "disease_name": "Bacterial Panicle Blight",
+        "caused_by": "Burkholderia glumae",
+        "description": "A bacterial disease affecting rice panicles, especially during hot and humid weather common in Sri Lanka's dry zone. Leads to poor grain development and yield loss.",
+        "symptoms": [
+            "Grains appear discolored (light brown to gray)",
+            "Unfilled or partially filled panicles",
+            "Foul, rotten odor from infected panicles",
+            "Premature drying of panicles"
+        ],
+        "factors": [
+            "High temperatures (above 35°C)",
+            "Excessive nitrogen fertilization",
+            "Dense planting"
+        ],
+        "prevention": [
+            "Use disease-free and certified seeds",
+            "Avoid overuse of nitrogen fertilizer",
+            "Ensure proper field spacing for air circulation",
+            "Rotate crops with non-host plants like pulses"
+        ],
+        "treatment": "No effective curative treatment. Focus on prevention through seed treatment and balanced nutrient management.",
+        "note": "Commonly observed in Anuradhapura and Polonnaruwa during Yala season."
+    },
+    "downey_mildew": {
+        "disease_name": "Downey Mildew",
+        "caused_by": "Sclerospora graminicola",
+        "description": "A fungal-like oomycete disease that spreads rapidly in wet, humid conditions typical of Sri Lanka's wet zone and intermediate zones.",
+        "symptoms": [
+            "Yellowish streaks on young leaves",
+            "White, downy fungal growth on underside of leaves",
+            "Stunted plant growth",
+            "Reduced tillering"
+        ],
+        "factors": [
+            "Prolonged leaf wetness from rain or fog",
+            "Poor drainage in low-lying fields",
+            "Overcrowded planting"
+        ],
+        "prevention": [
+            "Improve field drainage",
+            "Avoid excessive irrigation",
+            "Grow resistant varieties such as Bg 300, Bg 358",
+            "Destroy infected seedlings in nurseries"
+        ],
+        "treatment": "Apply protective fungicides like Mancozeb or Metalaxyl in early stages if outbreak is detected.",
+        "note": "Frequently seen in nursery beds in Kandy and Nuwara Eliya during rainy periods."
+    },
+    "dead_heart": {
+        "disease_name": "Dead Heart (Stem Borer Damage)",
+        "caused_by": "Scirpophaga incertulas (Yellow Stem Borer)",
+        "description": "Not a disease but a pest infestation. A major issue in Sri Lankan paddy fields where the stem borer larvae tunnel into the stem, killing the central shoot.",
+        "symptoms": [
+            "Central leaf whorl dries up and turns brown",
+            "No panicle emerges from affected tillers",
+            "Hollow stems with larval frass inside"
+        ],
+        "factors": [
+            "Continuous rice cultivation without fallow",
+            "Weedy fields providing shelter for pests",
+            "Use of highly susceptible varieties"
+        ],
+        "prevention": [
+            "Drain fields periodically to disrupt larval development",
+            "Use light traps to reduce adult moth populations",
+            "Encourage natural predators like spiders and wasps"
+        ],
+        "treatment": "Apply selective insecticides like Cartap hydrochloride or Chlorantraniliprole only when infestation exceeds economic threshold.",
+        "note": "Widespread during Maha season in Kurunegala and Puttalam."
+    },
+    "bacterial_leaf_blight": {
+        "disease_name": "Bacterial Leaf Blight",
+        "caused_by": "Xanthomonas oryzae pv. oryzae",
+        "description": "One of the most destructive bacterial diseases of rice in Sri Lanka, especially in irrigated and lowland areas with flood-prone conditions.",
+        "symptoms": [
+            "V-shaped, yellow-to-brown lesions starting from leaf margins",
+            "Lesions expand and merge, causing large blighted areas",
+            "Wilting and drying of entire leaves under severe infection"
+        ],
+        "factors": [
+            "Flooded or waterlogged fields",
+            "Wounding from wind, rain, or mechanical damage",
+            "Susceptible varieties like At 308"
+        ],
+        "prevention": [
+            "Use resistant varieties (e.g., Bg 379-2, Bg 380)",
+            "Avoid excessive nitrogen application",
+            "Practice alternate wetting and drying (AWD) irrigation"
+        ],
+        "treatment": "Spray copper-based bactericides (e.g., Copper oxychloride) at early symptom stage. Remove and destroy severely infected plants.",
+        "note": "Major problem in Hambantota and Ampara during Yala season after heavy rains."
+    },
+    "brown_spot": {
+        "disease_name": "Brown Spot",
+        "caused_by": "Cochliobolus miyabeanus",
+        "description": "A common fungal disease that affects leaves and grains, often associated with nutrient imbalance, particularly low silicon or potassium.",
+        "symptoms": [
+            "Small, circular brown spots with dark borders on leaves",
+            "Spots may have light centers",
+            "Severe infections cause leaf blight and poor grain filling"
+        ],
+        "factors": [
+            "Low soil fertility",
+            "Older plants under stress",
+            "High humidity and dew"
+        ],
+        "prevention": [
+            "Apply balanced fertilizers with emphasis on potassium and silicon",
+            "Use quality seed and maintain healthy seedlings",
+            "Ensure good air movement in field"
+        ],
+        "treatment": "Foliar spray with Mancozeb or Propiconazole if disease pressure is high. Most effective when applied at early boot stage.",
+        "note": "Often observed in poorly managed fields across the dry zone."
+    },
+    "normal": {
+        "disease_name": "Healthy Rice Plant",
+        "description": "No signs of disease, pests, or nutrient deficiency. Plant shows vigorous growth and green color.",
+        "symptoms": [],
+        "care": [
+            "Maintain proper water management",
+            "Follow recommended fertilizer schedule",
+            "Monitor regularly for early signs of pests or disease"
+        ],
+        "note": "Well-managed fields with good agronomic practices typically show this condition."
+    },
+    "hispa": {
+        "disease_name": "Hispa Beetle (Leaf Feeding Pest)",
+        "caused_by": "Dicladispa armigera",
+        "description": "An insect pest that feeds on leaf tissue, reducing photosynthesis. Common in transplanted rice fields during warm months.",
+        "symptoms": [
+            "Silvery-white scraping damage on upper leaf surface",
+            "Leaves appear thread-like or torn",
+            "Severe infestations cause stunted growth and yield loss"
+        ],
+        "factors": [
+            "Transplanted rice (vs. direct seeded)",
+            "Warm, dry weather followed by rain",
+            "Lack of natural predators"
+        ],
+        "prevention": [
+            "Avoid dense transplanting",
+            "Flood fields briefly to drown larvae",
+            "Hand-pick and destroy adults in small farms"
+        ],
+        "treatment": "Use insecticides like Cartap hydrochloride or Chlorpyrifos only when necessary. Avoid spraying during flowering to protect pollinators.",
+        "note": "Frequent in rice fields of Gampaha and Colombo districts."
+    },
+    "tungro": {
+        "disease_name": "Rice Tungro Disease",
+        "caused_by": "Tungro viruses (RTBV & RTSV), transmitted by green leafhoppers",
+        "description": "A viral disease that causes severe stunting and yield loss. Cannot be cured once a plant is infected.",
+        "symptoms": [
+            "Plants are stunted with reduced tillering",
+            "Leaves turn orange-yellow from tip downwards",
+            "Reduced panicle formation and grain yield"
+        ],
+        "factors": [
+            "Presence of green leafhoppers (vector)",
+            "Nearby infected fields or weed hosts",
+            "Planting during peak vector activity"
+        ],
+        "prevention": [
+            "Use resistant varieties like Bg 379-2 or At 362",
+            "Control leafhoppers using yellow sticky traps or neem-based sprays",
+            "Remove infected plants immediately"
+        ],
+        "treatment": "No cure available. Prevention is critical.",
+        "note": "Outbreaks often linked to continuous cropping without fallow in Monaragala."
+    },
+    "blast": {
+        "disease_name": "Rice Blast",
+        "caused_by": "Magnaporthe oryzae",
+        "description": "One of the most devastating diseases of rice worldwide and a recurring issue in Sri Lanka, especially in upland and rainfed ecosystems.",
+        "symptoms": [
+            "Diamond-shaped or spindle-shaped grayish lesions with dark borders on leaves",
+            "Neck blast causes panicle breakage and complete grain loss",
+            "Lesions may coalesce and kill entire leaves"
+        ],
+        "factors": [
+            "High humidity and dew",
+            "Excess nitrogen fertilizer",
+            "Shaded or overcrowded fields"
+        ],
+        "prevention": [
+            "Grow resistant varieties (e.g., Bg 300, Bg 358)",
+            "Avoid excessive nitrogen",
+            "Practice crop rotation and remove crop residue"
+        ],
+        "treatment": "Apply fungicides like Tricyclazole or Propiconazole at early boot stage if symptoms are detected.",
+        "note": "Major threat in Nuwara Eliya and Badulla during Yala season."
+    },
+    "bacterial_leaf_streak": {
+        "disease_name": "Bacterial Leaf Streak",
+        "caused_by": "Xanthomonas oryzae pv. oryzicola",
+        "description": "A bacterial disease that causes linear streaks on leaves, often confused with leaf blight. Spreads through water splash and wind-driven rain.",
+        "symptoms": [
+            "Water-soaked streaks on leaves that turn brown",
+            "Long, narrow streaks between veins",
+            "Leaves may tear easily under wind or rain"
+        ],
+        "factors": [
+            "Frequent rainfall and high humidity",
+            "Overhead irrigation or flooding",
+            "Wound entry through mechanical damage"
+        ],
+        "prevention": [
+            "Use certified, disease-free seeds",
+            "Avoid excessive nitrogen",
+            "Allow field drying between irrigations"
+        ],
+        "treatment": "Copper-based sprays (e.g., Copper oxychloride) can reduce spread if applied early.",
+        "note": "Increasingly reported in wet zone districts like Ratnapura and Kalutara."
+    }
+}
