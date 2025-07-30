@@ -1,0 +1,350 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rice Disease Detection API",
+    "version": "1.0.0",
+    "description": "An API for detecting rice diseases from images and providing information about them.",
+    "contact": {
+      "name": "KODEGAS AI Team",
+      "email": "kavix@yahoo.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://4.224.250.251",
+      "description": "Production Server"
+    },
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Checks if the API service is up and running.",
+        "responses": {
+          "200": {
+            "description": "API is healthy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classes": {
+      "get": {
+        "summary": "List Disease Classes",
+        "description": "Returns a list of all disease classes that the model can predict.",
+        "responses": {
+          "200": {
+            "description": "A list of disease classes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/info": {
+      "get": {
+        "summary": "Get Model Info",
+        "description": "Returns metadata about the machine learning model.",
+        "responses": {
+          "200": {
+            "description": "Model metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
+      "post": {
+        "summary": "Predict Disease",
+        "description": "Uploads an image of a rice plant to predict the disease.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file (e.g., JPG, PNG)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Prediction result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Prediction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/disease-info": {
+      "get": {
+        "summary": "List All Available Diseases",
+        "description": "Returns a list of all diseases for which information is available.",
+        "responses": {
+          "200": {
+            "description": "A list of available disease keys.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/disease-info/{name}": {
+      "get": {
+        "summary": "Get Specific Disease Info",
+        "description": "Retrieves detailed information about a specific disease.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "description": "The identifier for the disease (e.g., 'blast').",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detailed information about the disease.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseInfoDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/disease-medicines": {
+      "get": {
+        "summary": "Get Recommended Medicines",
+        "description": "Retrieves a list of recommended medicines for a specific disease.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "The identifier for the disease (e.g., 'blast').",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of recommended medicines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MedicineList"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "ok" },
+          "message": { "type": "string", "example": "Service is up and running" }
+        }
+      },
+      "ClassList": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["bacterial_panicle_blight", "downey_mildew", "dead_heart", "..."]
+          }
+        }
+      },
+      "ModelInfo": {
+        "type": "object",
+        "properties": {
+          "input_shape": { "type": "array", "items": { "type": "integer", "nullable": true }, "example": [null, 224, 224, 3] },
+          "output_shape": { "type": "array", "items": { "type": "integer", "nullable": true }, "example": [null, 10] },
+          "num_classes": { "type": "integer", "example": 10 },
+          "model_loaded": { "type": "boolean", "example": true }
+        }
+      },
+      "Prediction": {
+        "type": "object",
+        "properties": {
+          "predicted_class": { "type": "string", "example": "normal" },
+          "confidence": { "type": "number", "format": "float", "example": 0.8597 },
+          "all_confidences": {
+            "type": "object",
+            "additionalProperties": { "type": "number", "format": "float" },
+            "example": {
+              "bacterial_panicle_blight": 0.0,
+              "downey_mildew": 0.0935,
+              "dead_heart": 0.0335
+            }
+          }
+        }
+      },
+      "DiseaseList": {
+        "type": "object",
+        "properties": {
+          "available_diseases": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["bacterial_panicle_blight", "downey_mildew", "dead_heart", "..."]
+          }
+        }
+      },
+      "DiseaseInfo": {
+        "type": "object",
+        "properties": {
+          "disease_name": { "type": "string", "example": "Rice Blast" },
+          "caused_by": { "type": "string", "example": "Magnaporthe oryzae" },
+          "description": { "type": "string" },
+          "symptoms": { "type": "array", "items": { "type": "string" } },
+          "factors": { "type": "array", "items": { "type": "string" } },
+          "prevention": { "type": "array", "items": { "type": "string" } },
+          "treatment": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      },
+      "DiseaseInfoDetail": {
+        "type": "object",
+        "properties": {
+            "disease": { "type": "string", "example": "blast" },
+            "info": { "$ref": "#/components/schemas/DiseaseInfo" }
+        }
+      },
+      "Medicine": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Tricyclazole 75% WP" },
+          "brand": { "type": "string", "example": "BASF BlastX" },
+          "type": { "type": "string", "example": "Rice Blast Fungicide" },
+          "active_ingredient": { "type": "string", "example": "Tricyclazole" },
+          "pack_size": { "type": "string", "example": "250g" },
+          "price": { "type": "string", "example": "Rs. 1200" },
+          "image_url": { "type": "string", "format": "uri", "example": "https://example.com/images/tricyclazole.jpg" },
+          "application_rate": { "type": "string" },
+          "method": { "type": "string" },
+          "frequency": { "type": "string" },
+          "availability": { "type": "string" },
+          "priority": { "type": "integer", "example": 1 },
+          "note": { "type": "string" }
+        }
+      },
+      "MedicineList": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "blast" },
+          "recommended_medicines": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Medicine" }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "The specified resource was not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": { "detail": "Info for disease '...' not found." }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Invalid input provided.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": { "detail": "Invalid file type provided." }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal server or model error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": { "detail": "Internal server error" }
+          }
+        }
+      }
+    }
+  }
+}
