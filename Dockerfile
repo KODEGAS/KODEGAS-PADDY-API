@@ -1,14 +1,14 @@
 # Use official lightweight Python image
-FROM python:3.11.4
+FROM python:3.11.4-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Set environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Set working directory inside container
+# Set the working directory
 WORKDIR /app
 
-# Install system dependencies needed for TensorFlow and Pillow
+# Install system dependencies needed for TensorFlow, Pillow, and OpenCV
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -16,19 +16,21 @@ RUN apt-get update && \
     libjpeg-dev \
     zlib1g-dev \
     gcc \
-    && rm -rf /var/lib/apt/lists/*
+    libgl1-mesa-glx \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy Python dependencies
+# Copy only requirements first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Install Python packages
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Copy the rest of the application code
 COPY . .
 
-# Expose port (FastAPI will run on this)
+# Expose the application port
 EXPOSE 8000
 
-# Run the FastAPI app with Uvicorn
+# Run the FastAPI application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
