@@ -1,3 +1,5 @@
+# .github/workflows/your-workflow-file.yml
+
 name: Check & deploy API documentation
 permissions:
   contents: read
@@ -24,7 +26,7 @@ jobs:
         with:
           doc: kodegas-paddy-disease-api
           token: ${{secrets.BUMP_TOKEN}}
-          file: doc/api-documentation.yml
+          file: openapi.json  # <-- CHANGE THIS LINE
   api-diff:
     if: ${{ github.event_name == 'pull_request' }}
     name: Check API diff on Bump.sh
@@ -37,8 +39,7 @@ jobs:
         with:
           doc: kodegas-paddy-disease-api
           token: ${{secrets.BUMP_TOKEN}}
-          file: doc/api-documentation.yml
+          file: openapi.json  # <-- AND CHANGE THIS LINE
           command: diff
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
