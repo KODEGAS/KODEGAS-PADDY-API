@@ -1,34 +1,44 @@
-# .github/workflows/bump_documentation.yml
-
-name: Deploy API Documentation to Bump.sh
-
-# Run this workflow every time a change is pushed to the main branch
+name: Check & deploy API documentation
+permissions:
+  contents: read
+  pull-requests: write
 on:
   push:
     branches:
-      - main  # Or 'master', depending on your default branch name
-
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 jobs:
-  deploy-docs:
+  deploy-doc:
+    if: ${{ github.event_name == 'push' }}
+    name: Deploy API documentation on Bump.sh
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out your repository code
       - name: Checkout
-        uses: actions/checkout@v4
-
-      # Step 2: Deploy the documentation using the Bump.sh CLI Action
-      # This action finds your openapi.json file and sends it to Bump.sh
+        uses: actions/checkout@v3
       - name: Deploy API documentation
         uses: bump-sh/github-action@v1
         with:
-          # The slug for your documentation (the one you set up in the form)
-          doc: paddy-disease-api
-          
-          # The token and ID are securely stored as GitHub secrets
-          token: ${{ secrets.BUMP_TOKEN }}
-          id: ${{ secrets.BUMP_ID }}
-          
-          # The file containing your API definition. 
-          # FastAPI automatically creates this at the /openapi.json endpoint.
-          # We use the public URL of your deployed app.
-          file: https://paddy-disease-api.vercel.app/openapi.json
+          doc: kodegas-paddy-disease-api
+          token: ${{secrets.BUMP_TOKEN}}
+          file: doc/api-documentation.yml
+  api-diff:
+    if: ${{ github.event_name == 'pull_request' }}
+    name: Check API diff on Bump.sh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Comment pull request with API diff
+        uses: bump-sh/github-action@v1
+        with:
+          doc: kodegas-paddy-disease-api
+          token: ${{secrets.BUMP_TOKEN}}
+          file: doc/api-documentation.yml
+          command: diff
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
