@@ -1,7 +1,46 @@
-PyYaml==6.0
-fastapi==0.111.0
-uvicorn==0.30.1
-tensorflow==2.15.0
-pillow
+# Core FastAPI and web framework dependencies
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# Machine Learning and AI
+tensorflow>=2.13.0
 numpy>=1.24.0
-pydantic>=2.0.0
+Pillow>=10.0.0
+
+# Data validation and serialization
+pydantic>=2.5.0
+
+# System monitoring and utilities
+psutil>=5.9.0
+
+# Optional: Development and testing dependencies
+# Uncomment if needed for development
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# httpx>=0.25.0
+# black>=23.0.0
+# flake8>=6.0.0
+
+# Optional: Production dependencies
+# Uncomment if deploying to production
+# gunicorn>=21.2.0
+# python-jose[cryptography]>=3.3.0
+# python-dotenv>=1.0.0
+
+# Optional: Database dependencies (if you plan to add database later)
+# sqlalchemy>=2.0.0
+# alembic>=1.12.0
+# asyncpg>=0.29.0  # for PostgreSQL
+# aiomysql>=0.2.0  # for MySQL
+
+# Optional: Monitoring and logging (for production)
+# prometheus-client>=0.19.0
+# structlog>=23.2.0
+
+# Optional: File handling enhancements
+# aiofiles>=23.2.0
+
+# Optional: HTTP client for external API calls
+# httpx>=0.25.0
+# aiohttp>=3.9.0
