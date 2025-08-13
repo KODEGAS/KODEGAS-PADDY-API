@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "http://4.224.250.251",
+      "url": "http://4.224.250.251:8000",
       "description": "Production Server"
     },
     {
