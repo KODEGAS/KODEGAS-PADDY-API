@@ -35,6 +35,15 @@ app = FastAPI(
     },
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins in development
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+
 
 MODEL_PATH = "mymodel"  # Path to trained Keras model (HDF5 or SavedModel format)
 LABELS_FILE = "labels.txt"  # Class labels (e.g., '0 bacterial_panicle_blight')
