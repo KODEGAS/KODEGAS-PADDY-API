@@ -55,6 +55,18 @@ class Medicine(BaseModel):
             raise ValueError("priority must be >= 0")
         return v
 
+# Pydantic model for Disease Info validation
+class DiseaseInfo(BaseModel):
+    disease_name: str
+    caused_by: Optional[str] = None
+    description: str
+    symptoms: Optional[List[str]] = []
+    factors: Optional[List[str]] = []
+    prevention: Optional[List[str]] = []
+    care: Optional[List[str]] = []  # For normal/healthy plants
+    treatment: Optional[str] = None
+    note: Optional[str] = None
+
 def _read_medicines_json():
     """Thread-safe read of medicines JSON file"""
     with _file_lock:

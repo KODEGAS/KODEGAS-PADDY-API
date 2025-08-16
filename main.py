@@ -63,6 +63,18 @@ class Medicine(BaseModel):
             raise ValueError("priority must be >= 0")
         return v
 
+# Pydantic model for Disease Info validation
+class DiseaseInfo(BaseModel):
+    disease_name: str
+    caused_by: Optional[str] = None
+    description: str
+    symptoms: List[str]
+    factors: Optional[List[str]] = None
+    prevention: Optional[List[str]] = None
+    treatment: Optional[str] = None
+    care: Optional[List[str]] = None
+    note: Optional[str] = None
+
 def _read_medicines_json():
     """Thread-safe read of medicines JSON file"""
     with _file_lock:
@@ -93,6 +105,34 @@ def _write_medicines_json(data: dict):
             raise HTTPException(status_code=500, detail=f"Failed to write medicines file: {str(e)}")
 
 
+def _read_disease_info_json():
+    """Thread-safe read of disease info JSON file"""
+    with _file_lock:
+        try:
+            with open(DISEASE_INFO_FILE, "r", encoding="utf8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Malformed JSON in disease info file")
+
+def _write_disease_info_json(data: dict):
+    """Safe write: write to temp + atomic replace"""
+    with _file_lock:
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix=".tmp", dir=os.path.dirname(DISEASE_INFO_FILE))
+        try:
+            with os.fdopen(tmp_fd, "w", encoding="utf8") as tmp:
+                json.dump(data, tmp, indent=4, ensure_ascii=False)
+                tmp.flush()
+                os.fsync(tmp.fileno())
+            os.replace(tmp_path, DISEASE_INFO_FILE)
+        except Exception as e:
+            # Clean up temp file if something goes wrong
+            try:
+                os.unlink(tmp_path)
+            except:
+                pass
+            raise HTTPException(status_code=500, detail=f"Failed to write disease info file: {str(e)}")
 
 
 try:
@@ -330,3 +370,42 @@ def delete_medicine(
     }
 
 
+# CRUD Endpoints for Disease Info Management
+
+@app.get("/crud/disease-info", tags=["Disease Info CRUD"])
+def list_all_diseases_info_crud():
+    """List all disease keys from the disease info file"""
+    data = _read_disease_info_json()
+    return {"available_diseases": sorted(data.keys())}
+
+
+@app.get("/crud/disease-info/{disease_key}", tags=["Disease Info CRUD"])
+def get_disease_info_crud(disease_key: str = Path(..., description="Disease key e.g. 'blast'")):
+    """Fetch the full data object for a single disease"""
+    key = disease_key.strip().lower()
+    data = _read_disease_info_json()
+    if key not in data:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Disease info for '{key}' not found. Available diseases: {list(data.keys())}"
+        )
+    return {"disease_key": key, "data": data[key]}
+
+
+@app.put("/crud/disease-info/{disease_key}", tags=["Disease Info CRUD"])
+def update_disease_info_crud(
+    disease_key: str = Path(..., description="Disease key to update"),
+    info: DiseaseInfo = ...
+):
+    """Update the information for a specific disease"""
+    key = disease_key.strip().lower()
+    data = _read_disease_info_json()
+    
+    if key not in data:
+        raise HTTPException(status_code=404, detail=f"Disease '{key}' not found")
+    
+    # Update the disease info
+    data[key] = info.dict(exclude_none=True)
+    _write_disease_info_json(data)
+    
+    return {"disease_key": key, "updated": info, "message": "Disease info updated successfully"}

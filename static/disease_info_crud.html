@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Info CRUD Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        select, input, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input, .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            background: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav-link:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌿 Disease Info CRUD Manager</h1>
+        <a href="/static/crud.html" class="nav-link">Switch to Medicines Manager</a>
+        
+        <div class="controls">
+            <label for="diseaseSelect">Select Disease:</label>
+            <select id="diseaseSelect">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+
+        <div id="messages"></div>
+    </div>
+
+    <div class="container" id="formContainer" style="display: none;">
+        <h2 id="formTitle">Edit Disease Info</h2>
+        <form id="diseaseInfoForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_disease_name">Disease Name *</label>
+                    <input type="text" id="f_disease_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_caused_by">Caused By</label>
+                    <input type="text" id="f_caused_by">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="f_description">Description *</label>
+                <textarea id="f_description" required></textarea>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_symptoms">Symptoms (one per line)</label>
+                    <textarea id="f_symptoms"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="f_factors">Factors (one per line)</label>
+                    <textarea id="f_factors"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="f_prevention">Prevention (one per line)</label>
+                    <textarea id="f_prevention"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="f_care">Care (one per line)</label>
+                    <textarea id="f_care"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="f_treatment">Treatment</label>
+                <input type="text" id="f_treatment">
+            </div>
+            
+            <div class="form-group">
+                <label for="f_note">Note</label>
+                <textarea id="f_note"></textarea>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button type="submit">💾 Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8002';
+        
+        function showMessage(message, type = 'success') {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messagesDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        async function loadDiseases() {
+            try {
+                const response = await fetch(`${API_BASE}/crud/disease-info`);
+                if (!response.ok) throw new Error('Failed to load disease list');
+                
+                const data = await response.json();
+                const select = document.getElementById('diseaseSelect');
+                select.innerHTML = '<option value="">Select a disease to edit...</option>';
+                
+                data.available_diseases.forEach(disease => {
+                    const option = document.createElement('option');
+                    option.value = disease;
+                    option.textContent = disease.replace(/_/g, ' ').toUpperCase();
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showMessage('Error loading diseases: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadDiseaseInfo(diseaseKey) {
+            if (!diseaseKey) {
+                document.getElementById('formContainer').style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/crud/disease-info/${diseaseKey}`);
+                if (!response.ok) throw new Error('Failed to load disease information');
+                
+                const data = await response.json();
+                populateForm(data.data);
+                document.getElementById('formContainer').style.display = 'block';
+            } catch (error) {
+                showMessage('Error loading disease info: ' + error.message, 'error');
+            }
+        }
+        
+        function populateForm(info) {
+            document.getElementById('formTitle').textContent = `Edit Info for: ${info.disease_name}`;
+            
+            const fields = ['disease_name', 'caused_by', 'description', 'treatment', 'note'];
+            fields.forEach(field => {
+                const element = document.getElementById('f_' + field);
+                if (element) {
+                    element.value = info[field] || '';
+                }
+            });
+
+            const listFields = ['symptoms', 'factors', 'prevention', 'care'];
+            listFields.forEach(field => {
+                const textarea = document.getElementById('f_' + field);
+                if (textarea) {
+                    textarea.value = (info[field] || []).join('\n');
+                }
+            });
+        }
+        
+        document.getElementById('diseaseInfoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const diseaseKey = document.getElementById('diseaseSelect').value;
+            if (!diseaseKey) {
+                showMessage('Please select a disease first!', 'error');
+                return;
+            }
+            
+            const formData = {
+                disease_name: document.getElementById('f_disease_name').value,
+                caused_by: document.getElementById('f_caused_by').value || null,
+                description: document.getElementById('f_description').value,
+                treatment: document.getElementById('f_treatment').value || null,
+                note: document.getElementById('f_note').value || null,
+                symptoms: document.getElementById('f_symptoms').value.split('\n').filter(line => line.trim() !== ''),
+                factors: document.getElementById('f_factors').value.split('\n').filter(line => line.trim() !== ''),
+                prevention: document.getElementById('f_prevention').value.split('\n').filter(line => line.trim() !== ''),
+                care: document.getElementById('f_care').value.split('\n').filter(line => line.trim() !== '')
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/crud/disease-info/${diseaseKey}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to save disease info');
+                }
+                
+                showMessage(`Disease info for "${formData.disease_name}" updated successfully!`);
+            } catch (error) {
+                showMessage('Error saving disease info: ' + error.message, 'error');
+            }
+        });
+        
+        document.getElementById('diseaseSelect').addEventListener('change', (e) => {
+            loadDiseaseInfo(e.target.value);
+        });
+        
+        loadDiseases();
+    </script>
+</body>
+</html>
