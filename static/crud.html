@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Medicines CRUD Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        select, input, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        button.edit {
+            background: #28a745;
+        }
+        button.edit:hover {
+            background: #218838;
+        }
+        .medicine-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .medicine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .medicine-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+        .medicine-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .medicine-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        .detail-item {
+            background: white;
+            padding: 5px 8px;
+            border-radius: 3px;
+            border-left: 3px solid #007bff;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input, .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .priority-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 Disease Medicines CRUD Manager</h1>
+        
+        <div class="controls">
+            <label for="diseaseSelect">Select Disease:</label>
+            <select id="diseaseSelect">
+                <option value="">Loading...</option>
+            </select>
+            <button onclick="refreshList()">🔄 Refresh</button>
+            <button onclick="showAddForm()">➕ Add New Medicine</button>
+        </div>
+
+        <div id="messages"></div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Existing Medicines</h2>
+        <div id="medicinesList" class="loading">Loading medicines...</div>
+    </div>
+
+    <div class="container" id="formContainer" style="display: none;">
+        <h2 id="formTitle">➕ Add New Medicine</h2>
+        <form id="medicineForm">
+            <input type="hidden" id="editIndex" value="-1">
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_name">Medicine Name *</label>
+                    <input type="text" id="f_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_brand">Brand</label>
+                    <input type="text" id="f_brand">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_type">Type</label>
+                    <input type="text" id="f_type">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_active_ingredient">Active Ingredient</label>
+                    <input type="text" id="f_active_ingredient">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_pack_size">Pack Size</label>
+                    <input type="text" id="f_pack_size">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_price">Price</label>
+                    <input type="text" id="f_price">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_priority">Priority</label>
+                    <input type="number" id="f_priority" value="999" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_image_url">Image URL</label>
+                    <input type="url" id="f_image_url">
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_application_rate">Application Rate</label>
+                    <textarea id="f_application_rate"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_method">Method</label>
+                    <textarea id="f_method"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_frequency">Frequency</label>
+                    <textarea id="f_frequency"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="f_availability">Availability</label>
+                    <textarea id="f_availability"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="f_note">Notes</label>
+                <textarea id="f_note"></textarea>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button type="submit">💾 Save Medicine</button>
+                <button type="button" onclick="cancelEdit()">❌ Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        
+        // Show messages to user
+        function showMessage(message, type = 'success') {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messagesDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Load available diseases
+        async function loadDiseases() {
+            try {
+                const response = await fetch(`${API_BASE}/medicines`);
+                if (!response.ok) throw new Error('Failed to load diseases');
+                
+                const data = await response.json();
+                const select = document.getElementById('diseaseSelect');
+                select.innerHTML = '<option value="">Select a disease...</option>';
+                
+                data.available_diseases.forEach(disease => {
+                    const option = document.createElement('option');
+                    option.value = disease;
+                    option.textContent = disease.replace(/_/g, ' ').toUpperCase();
+                    select.appendChild(option);
+                });
+                
+                // Auto-select first disease if available
+                if (data.available_diseases.length > 0) {
+                    select.value = data.available_diseases[0];
+                    await refreshList();
+                }
+            } catch (error) {
+                showMessage('Error loading diseases: ' + error.message, 'error');
+            }
+        }
+        
+        // Refresh medicines list
+        async function refreshList() {
+            const disease = document.getElementById('diseaseSelect').value;
+            if (!disease) {
+                document.getElementById('medicinesList').innerHTML = '<p>Please select a disease first.</p>';
+                return;
+            }
+            
+            document.getElementById('medicinesList').innerHTML = '<div class="loading">Loading medicines...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/medicines/${disease}`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        document.getElementById('medicinesList').innerHTML = '<p>No medicines found for this disease.</p>';
+                        return;
+                    }
+                    throw new Error('Failed to load medicines');
+                }
+                
+                const data = await response.json();
+                displayMedicines(data.medicines);
+            } catch (error) {
+                document.getElementById('medicinesList').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Display medicines in the UI
+        function displayMedicines(medicines) {
+            const container = document.getElementById('medicinesList');
+            
+            if (medicines.length === 0) {
+                container.innerHTML = '<p>No medicines found for this disease.</p>';
+                return;
+            }
+            
+            container.innerHTML = medicines.map((medicine, index) => `
+                <div class="medicine-item">
+                    <div class="medicine-header">
+                        <div class="medicine-title">
+                            ${medicine.name} 
+                            <span class="priority-badge">Priority: ${medicine.priority || 999}</span>
+                        </div>
+                        <div class="medicine-actions">
+                            <button class="edit" onclick="editMedicine(${index}, ${JSON.stringify(medicine).replace(/"/g, '&quot;')})">
+                                ✏️ Edit
+                            </button>
+                            <button class="danger" onclick="deleteMedicine(${index}, '${medicine.name}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="medicine-details">
+                        ${medicine.brand ? `<div class="detail-item"><strong>Brand:</strong> ${medicine.brand}</div>` : ''}
+                        ${medicine.type ? `<div class="detail-item"><strong>Type:</strong> ${medicine.type}</div>` : ''}
+                        ${medicine.active_ingredient ? `<div class="detail-item"><strong>Active Ingredient:</strong> ${medicine.active_ingredient}</div>` : ''}
+                        ${medicine.pack_size ? `<div class="detail-item"><strong>Pack Size:</strong> ${medicine.pack_size}</div>` : ''}
+                        ${medicine.price ? `<div class="detail-item"><strong>Price:</strong> ${medicine.price}</div>` : ''}
+                        ${medicine.application_rate ? `<div class="detail-item"><strong>Application Rate:</strong> ${medicine.application_rate}</div>` : ''}
+                        ${medicine.method ? `<div class="detail-item"><strong>Method:</strong> ${medicine.method}</div>` : ''}
+                        ${medicine.frequency ? `<div class="detail-item"><strong>Frequency:</strong> ${medicine.frequency}</div>` : ''}
+                        ${medicine.availability ? `<div class="detail-item"><strong>Availability:</strong> ${medicine.availability}</div>` : ''}
+                        ${medicine.note ? `<div class="detail-item"><strong>Note:</strong> ${medicine.note}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Show add form
+        function showAddForm() {
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formTitle').textContent = '➕ Add New Medicine';
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('medicineForm').reset();
+            document.getElementById('f_priority').value = '999';
+            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Edit medicine
+        function editMedicine(index, medicine) {
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
+            document.getElementById('editIndex').value = index;
+            
+            // Populate form fields
+            const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
+            fields.forEach(field => {
+                const element = document.getElementById('f_' + field);
+                if (element) {
+                    element.value = medicine[field] || '';
+                }
+            });
+            
+            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Cancel edit
+        function cancelEdit() {
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('medicineForm').reset();
+            document.getElementById('editIndex').value = '-1';
+        }
+        
+        // Delete medicine
+        async function deleteMedicine(index, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+            
+            const disease = document.getElementById('diseaseSelect').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete medicine');
+                
+                showMessage(`Medicine "${name}" deleted successfully!`);
+                await refreshList();
+            } catch (error) {
+                showMessage('Error deleting medicine: ' + error.message, 'error');
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('medicineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const disease = document.getElementById('diseaseSelect').value;
+            if (!disease) {
+                showMessage('Please select a disease first!', 'error');
+                return;
+            }
+            
+            const index = parseInt(document.getElementById('editIndex').value);
+            const isEdit = index >= 0;
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('f_name').value,
+                brand: document.getElementById('f_brand').value || null,
+                type: document.getElementById('f_type').value || null,
+                active_ingredient: document.getElementById('f_active_ingredient').value || null,
+                pack_size: document.getElementById('f_pack_size').value || null,
+                price: document.getElementById('f_price').value || null,
+                priority: parseInt(document.getElementById('f_priority').value) || 999,
+                image_url: document.getElementById('f_image_url').value || null,
+                application_rate: document.getElementById('f_application_rate').value || null,
+                method: document.getElementById('f_method').value || null,
+                frequency: document.getElementById('f_frequency').value || null,
+                availability: document.getElementById('f_availability').value || null,
+                note: document.getElementById('f_note').value || null
+            };
+            
+            try {
+                const url = isEdit ? `${API_BASE}/medicines/${disease}/${index}` : `${API_BASE}/medicines/${disease}`;
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to save medicine');
+                }
+                
+                showMessage(`Medicine "${formData.name}" ${isEdit ? 'updated' : 'added'} successfully!`);
+                cancelEdit();
+                await refreshList();
+            } catch (error) {
+                showMessage('Error saving medicine: ' + error.message, 'error');
+            }
+        });
+        
+        // Auto-refresh when disease selection changes
+        document.getElementById('diseaseSelect').addEventListener('change', refreshList);
+        
+        // Initialize the page
+        loadDiseases();
+    </script>
+</body>
+</html>

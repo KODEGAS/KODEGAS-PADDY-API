@@ -1,10 +1,7 @@
-
-
 from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
-import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
@@ -14,8 +11,7 @@ import tempfile
 import os
 from typing import List, Dict, Any, Optional
 
-
-app = FastAPI()
+app = FastAPI(title="Paddy Disease API with CRUD", version="1.0.0")
 
 # Mount static files for serving the web interface
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -28,11 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
-MODEL_PATH = "mymodel"
-LABELS_FILE = "labels.txt"
+# File paths
 DISEASE_INFO_FILE = "disease_info.json"
 DISEASE_MEDICINES_FILE = "disease_medicines.json"
 
@@ -92,25 +84,13 @@ def _write_medicines_json(data: dict):
                 pass
             raise HTTPException(status_code=500, detail=f"Failed to write medicines file: {str(e)}")
 
-
-
-
-try:
-    model = tf.keras.models.load_model(MODEL_PATH)
-except Exception as e:
-    raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
-
-try:
-    with open(LABELS_FILE, "r") as f:
-        class_names = [line.strip().split(maxsplit=1)[-1] for line in f if line.strip()]
-except Exception as e:
-    raise RuntimeError(f"Failed to load labels from {LABELS_FILE}: {e}")
-
+# Load disease info and medicines data
 try:
     with open(DISEASE_INFO_FILE, "r") as f:
         disease_info = json.load(f)
 except Exception as e:
-    raise RuntimeError(f"Failed to load disease info from {DISEASE_INFO_FILE}: {e}")
+    print(f"Warning: Could not load disease info: {e}")
+    disease_info = {}
 
 try:
     with open(DISEASE_MEDICINES_FILE, "r") as f:
@@ -118,70 +98,14 @@ try:
 except Exception as e:
     raise RuntimeError(f"Failed to load medicine data from {DISEASE_MEDICINES_FILE}: {e}")
 
-
-
-
+# Basic endpoints
 @app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "ok", "message": "Service is up and running"}
-
-
-
-@app.get("/classes", tags=["Model"])
-def get_classes() -> Dict[str, List[str]]:
-    return {"classes": class_names}
-
-
-
-@app.get("/info", tags=["Model"])
-def model_info() -> Dict[str, Any]:
-    try:
-        input_shape = model.input_shape
-        output_shape = model.output_shape
-        return {
-            "input_shape": input_shape,
-            "output_shape": output_shape,
-            "num_classes": len(class_names),
-            "model_loaded": True
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving model info: {str(e)}")
-
-
-
-@app.post("/predict", tags=["Prediction"])
-async def predict(file: UploadFile = File(...)) -> Dict[str, Any]:
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
-    
-    contents = await file.read()
-    try:
-        image = Image.open(io.BytesIO(contents)).convert('RGB')
-        image = image.resize((224, 224))
-        image_array = np.array(image, dtype=np.float32) / 255.0
-        image_array = np.expand_dims(image_array, axis=0)
-        predictions = model.predict(image_array, verbose=0)[0]
-        top_class_idx = int(np.argmax(predictions))
-        confidence = float(predictions[top_class_idx])
-        predicted_class = class_names[top_class_idx]
-        return {
-            "predicted_class": predicted_class,
-            "confidence": round(confidence, 4),
-            "all_confidences": {
-                cls_name: round(float(conf), 4)
-                for cls_name, conf in zip(class_names, predictions)
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
-
-
+    return {"status": "ok", "message": "CRUD Service is up and running"}
 
 @app.get("/disease-info", tags=["Disease Info"])
 def list_diseases() -> Dict[str, List[str]]:
     return {"available_diseases": sorted(list(disease_info.keys()))}
-
-
 
 @app.get("/disease-info/{name}", tags=["Disease Info"])
 def get_disease_info(name: str = Path(..., description="Disease identifier (e.g., 'blast', 'bacterial_leaf_blight')")) -> Dict[str, Any]:
@@ -193,7 +117,6 @@ def get_disease_info(name: str = Path(..., description="Disease identifier (e.g.
             detail=f"Disease '{name}' not found. Available options: {list(disease_info.keys())}"
         )
     return {"disease": key, "info": info}
-
 
 @app.get("/disease-medicines", tags=["Treatment"])
 def get_disease_medicines(
@@ -209,7 +132,6 @@ def get_disease_medicines(
     sorted_medicines = sorted(medicines, key=lambda m: m.get("priority", 999))
     return {"name": key, "recommended_medicines": sorted_medicines}
 
-
 # CRUD Endpoints for Medicines Management
 
 @app.get("/medicines", tags=["Medicines CRUD"])
@@ -217,7 +139,6 @@ def list_all_diseases_crud():
     """List all disease keys in medicines file for CRUD operations"""
     data = _read_medicines_json()
     return {"available_diseases": sorted(data.keys())}
-
 
 @app.get("/medicines/{disease}", tags=["Medicines CRUD"])
 def list_medicines_crud(disease: str = Path(..., description="Disease key e.g. 'blast'")):
@@ -233,7 +154,6 @@ def list_medicines_crud(disease: str = Path(..., description="Disease key e.g. '
     medicines = sorted(data[key], key=lambda m: m.get("priority", 999))
     return {"disease": key, "medicines": medicines}
 
-
 @app.get("/medicines/{disease}/{idx}", tags=["Medicines CRUD"])
 def get_medicine_crud(
     disease: str = Path(..., description="Disease key"),
@@ -247,7 +167,6 @@ def get_medicine_crud(
     if idx >= len(data[key]):
         raise HTTPException(status_code=404, detail=f"Medicine index {idx} not found in '{key}'")
     return {"disease": key, "index": idx, "medicine": data[key][idx]}
-
 
 @app.post("/medicines/{disease}", status_code=201, tags=["Medicines CRUD"])
 def create_medicine(
@@ -276,7 +195,6 @@ def create_medicine(
     
     return {"disease": key, "created": medicine, "message": "Medicine added successfully"}
 
-
 @app.put("/medicines/{disease}/{idx}", tags=["Medicines CRUD"])
 def update_medicine(
     disease: str = Path(..., description="Disease key"),
@@ -297,7 +215,6 @@ def update_medicine(
     _write_medicines_json(data)
     
     return {"disease": key, "index": idx, "updated": medicine, "message": "Medicine updated successfully"}
-
 
 @app.delete("/medicines/{disease}/{idx}", tags=["Medicines CRUD"])
 def delete_medicine(
@@ -329,4 +246,6 @@ def delete_medicine(
         "message": "Medicine deleted successfully"
     }
 
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
