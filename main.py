@@ -1,6 +1,6 @@
 
 
-from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException, Form, Depends
+from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException, Form, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -11,6 +11,7 @@ from PIL import Image
 import io
 import json
 import secrets
+import uuid
 from typing import List, Dict, Any
 
 
@@ -21,14 +22,6 @@ app = FastAPI(
     contact={"name": "KODEGAS AI Team", "email": "kavix@yahoo.com"},
     license_info={"name": "MIT License"},
 )
-
-# Mount static files for admin interface
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Simple authentication
-security = HTTPBasic()
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "rice123"  # Change this in production!
 
 
 # For production, set allowed origins appropriately
@@ -266,114 +259,9 @@ async def debug_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image analysis failed: {str(e)}")
 
-
-# Authentication helper
-def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
-    correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
-    if not (correct_username and correct_password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    return credentials.username
-
-
-# Admin Panel Routes
-@app.get("/admin", response_class=HTMLResponse, tags=["Admin"])
-def admin_login():
-    """Admin login page"""
-    with open("static/login.html", "r") as f:
+@app.get("/json-viewer", response_class=HTMLResponse, tags=["JSON Viewer"])
+def json_viewer():
+    """Simple JSON viewer and editor"""
+    with open("json-viewer.html", "r") as f:
         return f.read()
-
-
-@app.get("/mobile-test", response_class=HTMLResponse, tags=["Admin"])
-def mobile_test():
-    """Mobile test page"""
-    with open("static/mobile-test.html", "r") as f:
-        return f.read()
-
-
-@app.get("/admin/dashboard", response_class=HTMLResponse, tags=["Admin"])
-def admin_dashboard(username: str = Depends(authenticate)):
-    """Admin dashboard - requires authentication"""
-    with open("static/dashboard.html", "r") as f:
-        return f.read()
-
-
-# CRUD Operations for Disease Info
-@app.get("/admin/api/disease-info", tags=["Admin API"])
-def get_all_disease_info(username: str = Depends(authenticate)):
-    """Get all disease information"""
-    return disease_info
-
-
-@app.put("/admin/api/disease-info/{disease_name}", tags=["Admin API"])
-def update_disease_info(disease_name: str, info: Dict[str, Any], username: str = Depends(authenticate)):
-    """Update disease information"""
-    disease_info[disease_name] = info
-    with open(DISEASE_INFO_FILE, "w") as f:
-        json.dump(disease_info, f, indent=2)
-    return {"message": f"Disease info for '{disease_name}' updated successfully"}
-
-
-@app.post("/admin/api/disease-info", tags=["Admin API"])
-def create_disease_info(disease_name: str = Form(...), info: str = Form(...), username: str = Depends(authenticate)):
-    """Create new disease information"""
-    try:
-        info_dict = json.loads(info)
-        disease_info[disease_name] = info_dict
-        with open(DISEASE_INFO_FILE, "w") as f:
-            json.dump(disease_info, f, indent=2)
-        return {"message": f"Disease info for '{disease_name}' created successfully"}
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON format")
-
-
-@app.delete("/admin/api/disease-info/{disease_name}", tags=["Admin API"])
-def delete_disease_info(disease_name: str, username: str = Depends(authenticate)):
-    """Delete disease information"""
-    if disease_name in disease_info:
-        del disease_info[disease_name]
-        with open(DISEASE_INFO_FILE, "w") as f:
-            json.dump(disease_info, f, indent=2)
-        return {"message": f"Disease info for '{disease_name}' deleted successfully"}
-    raise HTTPException(status_code=404, detail="Disease not found")
-
-
-# CRUD Operations for Disease Medicines
-@app.get("/admin/api/disease-medicines", tags=["Admin API"])
-def get_all_disease_medicines(username: str = Depends(authenticate)):
-    """Get all disease medicines"""
-    return disease_medicines
-
-
-@app.put("/admin/api/disease-medicines/{disease_name}", tags=["Admin API"])
-def update_disease_medicines(disease_name: str, medicines: List[Dict[str, Any]], username: str = Depends(authenticate)):
-    """Update disease medicines"""
-    disease_medicines[disease_name] = medicines
-    with open(DISEASE_MEDICINES_FILE, "w") as f:
-        json.dump(disease_medicines, f, indent=2)
-    return {"message": f"Medicines for '{disease_name}' updated successfully"}
-
-
-@app.post("/admin/api/disease-medicines", tags=["Admin API"])
-def create_disease_medicines(disease_name: str = Form(...), medicines: str = Form(...), username: str = Depends(authenticate)):
-    """Create new disease medicines"""
-    try:
-        medicines_list = json.loads(medicines)
-        disease_medicines[disease_name] = medicines_list
-        with open(DISEASE_MEDICINES_FILE, "w") as f:
-            json.dump(disease_medicines, f, indent=2)
-        return {"message": f"Medicines for '{disease_name}' created successfully"}
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON format")
-
-
-@app.delete("/admin/api/disease-medicines/{disease_name}", tags=["Admin API"])
-def delete_disease_medicines(disease_name: str, username: str = Depends(authenticate)):
-    """Delete disease medicines"""
-    if disease_name in disease_medicines:
-        del disease_medicines[disease_name]
-        with open(DISEASE_MEDICINES_FILE, "w") as f:
-            json.dump(disease_medicines, f, indent=2)
-        return {"message": f"Medicines for '{disease_name}' deleted successfully"}
-    raise HTTPException(status_code=404, detail="Disease not found")
 

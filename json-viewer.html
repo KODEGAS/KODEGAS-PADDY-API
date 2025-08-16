@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            background: #34495e;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .tab.active {
+            background: white;
+            color: #34495e;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .json-section {
+            display: none;
+        }
+
+        .json-section.active {
+            display: block;
+        }
+
+        .row {
+            display: flex;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .row:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .row-header {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        .key {
+            flex: 0 0 200px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .value {
+            flex: 1;
+            padding-left: 20px;
+        }
+
+        .actions {
+            flex: 0 0 100px;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-add {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .nested {
+            margin-left: 20px;
+            border-left: 2px solid #3498db;
+            padding-left: 10px;
+        }
+
+        .array-item {
+            background: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 JSON Data Viewer & Editor</h1>
+            <p>View and edit your rice disease data</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('disease-info')">Disease Information</button>
+            <button class="tab" onclick="showTab('disease-medicines')">Disease Medicines</button>
+        </div>
+
+        <div class="content">
+            <!-- Disease Info Section -->
+            <div id="disease-info" class="json-section active">
+                <button class="btn btn-add" onclick="addNew('disease-info')">+ Add New Disease Info</button>
+                <div id="disease-info-content" class="loading">Loading disease information...</div>
+            </div>
+
+            <!-- Disease Medicines Section -->
+            <div id="disease-medicines" class="json-section">
+                <button class="btn btn-add" onclick="addNew('disease-medicines')">+ Add New Medicine Set</button>
+                <div id="disease-medicines-content" class="loading">Loading disease medicines...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diseaseInfoData = {};
+        let diseaseMedicinesData = {};
+
+        // Load JSON data
+        async function loadData() {
+            try {
+                // Load disease info
+                const infoResponse = await fetch('disease_info.json');
+                diseaseInfoData = await infoResponse.json();
+                displayDiseaseInfo();
+
+                // Load disease medicines
+                const medicinesResponse = await fetch('disease_medicines.json');
+                diseaseMedicinesData = await medicinesResponse.json();
+                displayDiseaseMedicines();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('disease-info-content').innerHTML =
+                    '<div class="error">Error loading disease_info.json</div>';
+                document.getElementById('disease-medicines-content').innerHTML =
+                    '<div class="error">Error loading disease_medicines.json</div>';
+            }
+        }
+
+        // Display disease info in rows
+        function displayDiseaseInfo() {
+            const container = document.getElementById('disease-info-content');
+            let html = '';
+
+            // Header row
+            html += `
+                <div class="row row-header">
+                    <div class="key">Disease Key</div>
+                    <div class="value">Disease Details</div>
+                    <div class="actions">Actions</div>
+                </div>
+            `;
+
+            // Data rows
+            Object.entries(diseaseInfoData).forEach(([key, info]) => {
+                html += `
+                    <div class="row">
+                        <div class="key">${key}</div>
+                        <div class="value">
+                            <strong>${info.disease_name || 'N/A'}</strong><br>
+                            <small>Caused by: ${info.caused_by || 'N/A'}</small><br>
+                            <small>${(info.description || '').substring(0, 100)}...</small>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-edit" onclick="editItem('disease-info', '${key}')">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteItem('disease-info', '${key}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+
+                // Show nested data
+                if (info.symptoms && Array.isArray(info.symptoms)) {
+                    html += `
+                        <div class="row">
+                            <div class="key"></div>
+                            <div class="value nested">
+                                <strong>Symptoms:</strong> ${info.symptoms.join(', ')}
+                            </div>
+                            <div class="actions"></div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Display disease medicines in rows
+        function displayDiseaseMedicines() {
+            const container = document.getElementById('disease-medicines-content');
+            let html = '';
+
+            // Header row
+            html += `
+                <div class="row row-header">
+                    <div class="key">Disease Key</div>
+                    <div class="value">Medicines</div>
+                    <div class="actions">Actions</div>
+                </div>
+            `;
+
+            // Data rows
+            Object.entries(diseaseMedicinesData).forEach(([key, medicines]) => {
+                html += `
+                    <div class="row">
+                        <div class="key">${key}</div>
+                        <div class="value">
+                            <strong>${Array.isArray(medicines) ? medicines.length : 0} Medicine(s)</strong>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-edit" onclick="editItem('disease-medicines', '${key}')">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteItem('disease-medicines', '${key}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+
+                // Show medicines
+                if (Array.isArray(medicines)) {
+                    medicines.forEach((medicine, index) => {
+                        html += `
+                            <div class="row">
+                                <div class="key"></div>
+                                <div class="value nested array-item">
+                                    <strong>${medicine.name || 'Unnamed'}</strong> - ${medicine.brand || 'No brand'}<br>
+                                    <small>Type: ${medicine.type || 'N/A'} | Price: ${medicine.price || 'N/A'} | Priority: ${medicine.priority || 'N/A'}</small>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn btn-edit" onclick="editMedicine('${key}', ${index})">Edit</button>
+                                    <button class="btn btn-delete" onclick="deleteMedicine('${key}', ${index})">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.json-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Placeholder functions for CRUD operations
+        function editItem(type, key) {
+            alert(`Edit ${type}: ${key}\n(Edit functionality will be added next)`);
+        }
+
+        function deleteItem(type, key) {
+            if (confirm(`Delete ${key} from ${type}?`)) {
+                alert('Delete functionality will be added next');
+            }
+        }
+
+        function addNew(type) {
+            alert(`Add new ${type}\n(Add functionality will be added next)`);
+        }
+
+        function editMedicine(diseaseKey, medicineIndex) {
+            alert(`Edit medicine ${medicineIndex} for ${diseaseKey}\n(Edit functionality will be added next)`);
+        }
+
+        function deleteMedicine(diseaseKey, medicineIndex) {
+            if (confirm(`Delete medicine ${medicineIndex} from ${diseaseKey}?`)) {
+                alert('Delete functionality will be added next');
+            }
+        }
+
+        // Load data when page loads
+        loadData();
+    </script>
+</body>
+
+</html>
