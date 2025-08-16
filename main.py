@@ -1,7 +1,5 @@
 
 
-
-
 from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import tensorflow as tf
@@ -106,20 +104,49 @@ def model_info() -> Dict[str, Any]:
 async def predict(file: UploadFile = File(...)) -> Dict[str, Any]:
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
+    
+    # Check file size (limit to 10MB)
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413, 
+            detail=f"File too large. Maximum size is {MAX_FILE_SIZE // (1024*1024)}MB, got {len(contents) // (1024*1024)}MB"
+        )
+    
     try:
-        contents = await file.read()
         image = Image.open(io.BytesIO(contents))
         
         # Debug info about original image
         original_size = image.size
         original_mode = image.mode
         
+        # Handle EXIF orientation (common in camera photos)
+        try:
+            from PIL.ExifTags import ORIENTATION
+            exif = image._getexif()
+            if exif is not None:
+                orientation = exif.get(0x0112)  # Orientation tag
+                if orientation == 3:
+                    image = image.rotate(180, expand=True)
+                elif orientation == 6:
+                    image = image.rotate(270, expand=True)
+                elif orientation == 8:
+                    image = image.rotate(90, expand=True)
+        except:
+            pass  # Skip if no EXIF data
+        
         # Better preprocessing
         # Convert to RGB (handles grayscale, RGBA, etc.)
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-        # Resize with better quality
+        # For very large images, resize in steps to preserve quality
+        if max(image.size) > 1000:
+            # First resize to reasonable size, maintaining aspect ratio
+            image.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
+        
+        # Final resize to model input size
         image = image.resize((224, 224), Image.Resampling.LANCZOS)
         
         # Convert to array and normalize
