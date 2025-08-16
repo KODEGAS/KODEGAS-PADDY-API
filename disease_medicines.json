@@ -269,6 +269,21 @@
             "availability": "Available in commercial farming regions",
             "priority": 2,
             "note": "Long residual activity. Good alternative to rotate with Tricyclazole."
+        },
+        {
+            "name": "Test Medicine",
+            "brand": "Test Brand",
+            "type": "Fungicide",
+            "active_ingredient": null,
+            "pack_size": null,
+            "price": null,
+            "image_url": null,
+            "application_rate": null,
+            "method": null,
+            "frequency": null,
+            "availability": null,
+            "priority": 999,
+            "note": null
         }
     ],
     "bacterial_leaf_streak": [

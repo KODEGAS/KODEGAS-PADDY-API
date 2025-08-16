@@ -6,6 +6,9 @@ __pycache__/
 .Python
 build/
 develop-eggs/
+.vscode
+.venv
+__pycache__
 dist/
 downloads/
 eggs/

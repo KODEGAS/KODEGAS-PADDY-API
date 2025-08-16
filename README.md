@@ -1,275 +1,128 @@
+# Paddy Disease Detection API
 
-
-# Rice Disease Detection API Documentation
-
-## Overview
-
-The Rice Disease Detection API is a FastAPI-based service for:
-- Predicting rice diseases from leaf/panicle images using a pre-trained deep learning model.
-- Providing detailed disease information and recommended treatments (medicines).
-
----
+This project is a FastAPI-based API for detecting diseases in paddy crops from images. It uses a trained TensorFlow model to classify diseases and provides a comprehensive set of endpoints to manage disease information and recommended medicines. The API also includes a simple web interface for CRUD operations on the data.
 
 ## Features
 
-- **/health**: Health check endpoint.
-- **/classes**: List all detectable disease classes.
-- **/info**: Model input/output metadata.
-- **/predict**: Predict disease from uploaded image.
-- **/disease-info**: List all diseases or get info about a specific one.
-- **/disease-medicines**: Get recommended treatments for a given disease.
+- **Disease Prediction:** Upload an image of a paddy leaf to get a prediction of the disease and the confidence score.
+- **Disease Information:** Get detailed information about different paddy diseases, including symptoms, causes, and prevention methods.
+- **Medicine Recommendations:** Get a list of recommended medicines for a specific disease, sorted by priority.
+- **CRUD Operations:** A web-based interface to Create, Read, Update, and Delete disease information and medicine data.
+- **Dockerized:** The application is fully containerized for easy deployment.
+- **Health Check:** A `/health` endpoint to monitor the service status.
 
----
+## Project Structure
 
-## Setup
-
-### Requirements
-
-- Python 3.11+
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [TensorFlow](https://www.tensorflow.org/)
-- [Pillow (PIL)](https://python-pillow.org/)
-- [Uvicorn](https://www.uvicorn.org/)
-
-Install dependencies:
-```sh
-pip install -r requirements.txt
+```
+.
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── disease_info.json
+├── disease_medicines.json
+├── labels.txt
+├── main.py
+├── mymodel
+│   ├── saved_model.pb
+│   └── variables
+│       ├── variables.data-00000-of-00001
+│       └── variables.index
+├── openapi.json
+├── requirements.txt
+└── static
+    ├── api_data.html
+    ├── crud.html
+    └── disease_info_crud.html
 ```
 
-### Running the API
+## API Endpoints
 
-```sh
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+A full list of API endpoints is available in the `openapi.json` file and can be accessed interactively at `/docs` when the application is running.
+
+### Main Endpoints
+
+- `POST /predict`: Upload an image file to get a disease prediction.
+- `GET /disease-info/{name}`: Get detailed information about a specific disease.
+- `GET /disease-medicines?name={name}`: Get recommended medicines for a disease.
+- `GET /health`: Health check endpoint.
+
+### CRUD Endpoints
+
+The API also provides a full set of CRUD endpoints for managing the `disease_info.json` and `disease_medicines.json` files. These are primarily used by the static web interface.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11
+- Docker (for containerized deployment)
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/kavindus0/paddy_disease_api.git
+    cd paddy_disease_api
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Running the Application
+
+#### Locally
+
+To run the application locally, use `uvicorn`:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
----
+The API will be available at `http://localhost:8000`.
 
-## Endpoints
+#### Using Docker
 
-### 1. Health Check
+To build and run the application using Docker:
 
-**GET /health**
+1.  **Build the Docker image:**
 
-Check if the API is running.
+    ```bash
+    docker build -t paddy-disease-api .
+    ```
 
-**Response:**
-```json
-{
-  "status": "ok",
-  "message": "Service is up and running"
-}
-```
+2.  **Run the Docker container:**
 
----
+    ```bash
+    docker run -p 8000:8000 paddy-disease-api
+    ```
 
-### 2. List Disease Classes
+The API will be available at `http://localhost:8000`.
 
-**GET /classes**
+## Security
 
-Returns all disease classes the model can predict.
+The CRUD endpoints (`/medicines/*` and `/crud/disease-info/*`) are protected by API key authentication. To use these endpoints, you must provide a valid API key in the `X-API-KEY` header of your request.
 
-**Response:**
-```json
-{
-  "classes": [
-    "bacterial_panicle_blight",
-    "downey_mildew",
-    "dead_heart",
-    "bacterial_leaf_blight",
-    "brown_spot",
-    "normal",
-    "hispa",
-    "tungro",
-    "blast",
-    "bacterial_leaf_streak"
-  ]
-}
-```
+The default API key is `your-secret-api-key`. You can change this in the `auth.py` file. For production environments, it is highly recommended to use an environment variable to store the API key.
 
----
+When using the web interface, you will be prompted to enter the API key the first time you try to perform a protected action. The key will be stored in your browser's session storage for convenience.
 
-### 3. Model Info
+## Web Interface
 
-**GET /info**
+The application includes a simple web interface for managing the data. It can be accessed at `/static/api_data.html`.
 
-Returns model metadata.
-
-**Response:**
-```json
-{
-  "input_shape": [null, 224, 224, 3],
-  "output_shape": [null, 10],
-  "num_classes": 10,
-  "model_loaded": true
-}
-```
-
----
-
-### 4. Predict Disease
-
-**POST /predict**
-
-Upload an image to predict the disease.
-
-**Request:**
-- Form-data: `file` (image file, e.g., JPG, PNG)
-
-**Response:**
-```json
-{
-  "predicted_class": "blast",
-  "confidence": 0.9876,
-  "all_confidences": {
-    "bacterial_panicle_blight": 0.0001,
-    "downey_mildew": 0.0002,
-    "...": "...",
-    "blast": 0.9876,
-    "bacterial_leaf_streak": 0.0001
-  }
-}
-```
-
----
-
-### 5. List All Diseases
-
-**GET /disease-info**
-
-Returns all disease keys available.
-
-**Response:**
-```json
-{
-  "available_diseases": [
-    "bacterial_panicle_blight",
-    "downey_mildew",
-    "dead_heart",
-    "bacterial_leaf_blight",
-    "brown_spot",
-    "normal",
-    "hispa",
-    "tungro",
-    "blast",
-    "bacterial_leaf_streak"
-  ]
-}
-```
-
----
-
-### 6. Get Disease Info
-
-**GET /disease-info/{name}**
-
-Get detailed info about a specific disease.
-
-**Path Parameter:**
-- `name`: Disease identifier (e.g., `blast`)
-
-**Response:**
-```json
-{
-  "disease": "blast",
-  "info": {
-    "disease_name": "Rice Blast",
-    "caused_by": "Magnaporthe oryzae",
-    "description": "...",
-    "symptoms": ["..."],
-    "factors": ["..."],
-    "prevention": ["..."],
-    "treatment": "...",
-    "note": "..."
-  }
-}
-```
-
----
-
-### 7. Get Disease Medicines
-
-**GET /disease-medicines?name={disease}**
-
-Get recommended medicines for a disease.
-
-**Query Parameter:**
-- `name`: Disease identifier (e.g., `blast`)
-
-**Response:**
-```json
-{
-  "name": "blast",
-  "recommended_medicines": [
-    {
-      "name": "Tricyclazole 75% WP",
-      "brand": "BASF BlastX",
-      "type": "Rice Blast Fungicide",
-      "active_ingredient": "Tricyclazole",
-      "pack_size": "250g",
-      "price": "Rs. 1200",
-      "image_url": "https://example.com/images/tricyclazole.jpg",
-      "application_rate": "1g per liter of water",
-      "method": "Spray at booting stage – critical for neck blast prevention",
-      "frequency": "One preventive spray is usually sufficient",
-      "availability": "Highly recommended and stocked in blast-prone areas",
-      "priority": 1,
-      "note": "Do not wait for symptoms. Proactive spraying is most effective."
-    },
-    ...
-  ]
-}
-```
-
----
+-   **Manage Medicines:** A CRUD interface for adding, editing, and deleting medicine information for each disease.
+-   **Manage Disease Info:** A CRUD interface for updating the information for each disease.
 
 ## Data Files
 
-- labels.txt: List of class labels.
-- disease_info.json: Disease descriptions, symptoms, prevention, and treatment.
-- disease_medicines.json: Recommended medicines for each disease.
+-   `disease_info.json`: Contains detailed information about each disease.
+-   `disease_medicines.json`: Contains a list of recommended medicines for each disease.
+-   `labels.txt`: A list of the class names that the model can predict.
 
----
+## Model
 
-## Example Usage
-
-**Predict Disease (using curl):**
-```sh
-curl -X POST "http://localhost:8000/predict" -F "file=@/path/to/leaf.jpg"
-```
-
-**Get Disease Info:**
-```sh
-curl "http://localhost:8000/disease-info/blast"
-```
-
-**Get Medicines:**
-```sh
-curl "http://localhost:8000/disease-medicines?name=blast"
-```
-
----
-
-## Error Handling
-
-- 400: Invalid input (e.g., wrong file type)
-- 404: Disease or medicine info not found
-- 500: Internal server/model error
-
----
-
-## License
-
-MIT License
-
----
-
-## Contact
-
-- KODEGAS AI Team
-- Email: kavix@yahoo.com
-
----
-
-For more details, see the README.md and source code in main.py.
-- If you want to upgrade Python, you can change the image in the [Dockerfile](./.codesandbox/Dockerfile).
-- Modify [requirements.txt](./requirements.txt) to add packages.
+The prediction model is a trained TensorFlow model located in the `mymodel/` directory. It is loaded at startup and used by the `/predict` endpoint.

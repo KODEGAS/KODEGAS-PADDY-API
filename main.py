@@ -1,9 +1,11 @@
 
 
-from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException
+from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, validator
+from auth import get_api_key
 import tensorflow as tf
 import numpy as np
 from PIL import Image
@@ -20,15 +22,26 @@ app = FastAPI()
 # Mount static files for serving the web interface
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Define allowed origins for CORS
+# In a production environment, this should be restricted to your frontend's domain
+origins = [
+    "http://localhost",
+    "http://localhost:8002",
+    "https://your-domain.com",  # Placeholder for your production domain
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
 
+@app.get("/", include_in_schema=False)
+async def root():
+    return FileResponse("static/api_data.html")
 
 
 MODEL_PATH = "mymodel"
@@ -292,7 +305,8 @@ def get_medicine_crud(
 @app.post("/medicines/{disease}", status_code=201, tags=["Medicines CRUD"])
 def create_medicine(
     disease: str = Path(..., description="Disease key"),
-    medicine: Medicine = ...
+    medicine: Medicine = ...,
+    api_key: str = Depends(get_api_key)
 ):
     """Add a new medicine to a disease category"""
     key = disease.strip().lower()
@@ -321,7 +335,8 @@ def create_medicine(
 def update_medicine(
     disease: str = Path(..., description="Disease key"),
     idx: int = Path(..., ge=0, description="0-based index of medicine to update"),
-    medicine: Medicine = ...
+    medicine: Medicine = ...,
+    api_key: str = Depends(get_api_key)
 ):
     """Update an existing medicine"""
     key = disease.strip().lower()
@@ -342,7 +357,8 @@ def update_medicine(
 @app.delete("/medicines/{disease}/{idx}", tags=["Medicines CRUD"])
 def delete_medicine(
     disease: str = Path(..., description="Disease key"),
-    idx: int = Path(..., ge=0, description="0-based index of medicine to delete")
+    idx: int = Path(..., ge=0, description="0-based index of medicine to delete"),
+    api_key: str = Depends(get_api_key)
 ):
     """Delete a medicine from a disease category"""
     key = disease.strip().lower()
@@ -395,7 +411,8 @@ def get_disease_info_crud(disease_key: str = Path(..., description="Disease key 
 @app.put("/crud/disease-info/{disease_key}", tags=["Disease Info CRUD"])
 def update_disease_info_crud(
     disease_key: str = Path(..., description="Disease key to update"),
-    info: DiseaseInfo = ...
+    info: DiseaseInfo = ...,
+    api_key: str = Depends(get_api_key)
 ):
     """Update the information for a specific disease"""
     key = disease_key.strip().lower()

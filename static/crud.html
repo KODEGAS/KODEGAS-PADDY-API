@@ -3,148 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disease Medicines CRUD Manager</title>
+    <title>Medicines Manager</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #007bff;
+        }
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #6c757d;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        nav a:hover {
+            background-color: #5a6268;
         }
         .container {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
-        h1, h2 {
-            color: #333;
+        h2 {
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 0;
         }
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
             margin-bottom: 20px;
         }
         select, input, button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
             border-radius: 4px;
+            font-size: 1em;
         }
         button {
             background: #007bff;
             color: white;
             cursor: pointer;
             border: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         button:hover {
             background: #0056b3;
         }
-        button.danger {
-            background: #dc3545;
-        }
-        button.danger:hover {
-            background: #c82333;
-        }
-        button.edit {
-            background: #28a745;
-        }
-        button.edit:hover {
-            background: #218838;
-        }
+        button.danger { background: #dc3545; }
+        button.danger:hover { background: #c82333; }
+        button.edit { background: #28a745; }
+        button.edit:hover { background: #218838; }
         .medicine-item {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-            background: #f9f9f9;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            background: #f8f9fa;
         }
         .medicine-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .medicine-title {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
+            font-weight: 600;
+            font-size: 1.2em;
+            color: #0056b3;
         }
-        .medicine-actions {
-            display: flex;
-            gap: 5px;
-        }
+        .medicine-actions { display: flex; gap: 8px; }
         .medicine-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            font-size: 0.9em;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            font-size: 0.95em;
         }
         .detail-item {
-            background: white;
-            padding: 5px 8px;
-            border-radius: 3px;
-            border-left: 3px solid #007bff;
+            background: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .detail-item strong { color: #495057; }
+        fieldset {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        legend {
+            font-weight: 600;
+            color: #007bff;
+            padding: 0 10px;
         }
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 500; color: #495057; }
         .form-group input, .form-group textarea {
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            border: 1px solid #ced4da;
             border-radius: 4px;
         }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
         .priority-badge {
             background: #17a2b8;
             color: white;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 12px;
-            font-size: 0.8em;
+            font-size: 0.85em;
+            margin-left: 10px;
         }
-        .loading {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
+        .loading, .error, .success {
+            padding: 15px;
+            border-radius: 5px;
             margin: 10px 0;
         }
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
+        .loading { text-align: center; color: #6c757d; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
+    <header>
+        <h1>🌾 Medicines Manager</h1>
+        <nav>
+            <a href="/static/api_data.html">Data Hub</a>
+            <a href="/static/disease_info_crud.html">Manage Disease Info</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <h1>🌾 Disease Medicines CRUD Manager</h1>
-        <a href="/static/disease_info_crud.html" class="nav-link" style="display: inline-block; margin-bottom: 20px; background: #6c757d; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Switch to Disease Info Manager</a>
-        
+        <h2>Control Panel</h2>
         <div class="controls">
             <label for="diseaseSelect">Select Disease:</label>
             <select id="diseaseSelect">
@@ -152,6 +171,11 @@
             </select>
             <button onclick="refreshList()">🔄 Refresh</button>
             <button onclick="showAddForm()">➕ Add New Medicine</button>
+        </div>
+        <div class="controls" style="margin-top: 15px;">
+            <label for="apiKeyInput">API Key:</label>
+            <input type="password" id="apiKeyInput" placeholder="Enter API Key">
+            <button onclick="saveApiKey()">💾 Save API Key</button>
         </div>
 
         <div id="messages"></div>
@@ -167,74 +191,81 @@
         <form id="medicineForm">
             <input type="hidden" id="editIndex" value="-1">
             
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="f_name">Medicine Name *</label>
-                    <input type="text" id="f_name" required>
+            <fieldset>
+                <legend>Basic Information</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_name">Medicine Name *</label>
+                        <input type="text" id="f_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_brand">Brand</label>
+                        <input type="text" id="f_brand">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_type">Type</label>
+                        <input type="text" id="f_type">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_active_ingredient">Active Ingredient</label>
+                        <input type="text" id="f_active_ingredient">
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="f_brand">Brand</label>
-                    <input type="text" id="f_brand">
+            </fieldset>
+
+            <fieldset>
+                <legend>Purchase Details</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_pack_size">Pack Size</label>
+                        <input type="text" id="f_pack_size">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_price">Price</label>
+                        <input type="text" id="f_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_availability">Availability</label>
+                        <input type="text" id="f_availability">
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="f_type">Type</label>
-                    <input type="text" id="f_type">
+            </fieldset>
+
+            <fieldset>
+                <legend>Application</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_application_rate">Application Rate</label>
+                        <input type="text" id="f_application_rate">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_method">Method</label>
+                        <input type="text" id="f_method">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_frequency">Frequency</label>
+                        <input type="text" id="f_frequency">
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="f_active_ingredient">Active Ingredient</label>
-                    <input type="text" id="f_active_ingredient">
+            </fieldset>
+
+            <fieldset>
+                <legend>Metadata</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_priority">Priority</label>
+                        <input type="number" id="f_priority" value="999" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_image_url">Image URL</label>
+                        <input type="url" id="f_image_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_note">Notes</label>
+                        <textarea id="f_note"></textarea>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="f_pack_size">Pack Size</label>
-                    <input type="text" id="f_pack_size">
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_price">Price</label>
-                    <input type="text" id="f_price">
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_priority">Priority</label>
-                    <input type="number" id="f_priority" value="999" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_image_url">Image URL</label>
-                    <input type="url" id="f_image_url">
-                </div>
-            </div>
-            
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="f_application_rate">Application Rate</label>
-                    <textarea id="f_application_rate"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_method">Method</label>
-                    <textarea id="f_method"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_frequency">Frequency</label>
-                    <textarea id="f_frequency"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="f_availability">Availability</label>
-                    <textarea id="f_availability"></textarea>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="f_note">Notes</label>
-                <textarea id="f_note"></textarea>
-            </div>
+            </fieldset>
             
             <div style="margin-top: 20px;">
                 <button type="submit">💾 Save Medicine</button>
@@ -244,7 +275,43 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:8002';
+        const API_BASE = ''; // Use relative paths for API calls
+        const API_KEY_NAME = "X-API-KEY";
+        let apiKey = sessionStorage.getItem(API_KEY_NAME);
+
+        // Load API key from session storage on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedKey = sessionStorage.getItem(API_KEY_NAME);
+            if (storedKey) {
+                document.getElementById('apiKeyInput').value = storedKey;
+                apiKey = storedKey;
+            }
+        });
+
+        function saveApiKey() {
+            const inputKey = document.getElementById('apiKeyInput').value;
+            if (inputKey) {
+                sessionStorage.setItem(API_KEY_NAME, inputKey);
+                apiKey = inputKey;
+                showMessage("API Key saved!", "success");
+            } else {
+                showMessage("Please enter an API Key to save.", "error");
+            }
+        }
+
+        function ensureApiKey() {
+            if (!apiKey) {
+                const inputKey = document.getElementById('apiKeyInput').value;
+                if (inputKey) {
+                    sessionStorage.setItem(API_KEY_NAME, inputKey);
+                    apiKey = inputKey;
+                } else {
+                    showMessage("Please enter your API Key in the input field.", "error");
+                    return null;
+                }
+            }
+            return apiKey;
+        }
         
         // Show messages to user
         function showMessage(message, type = 'success') {
@@ -387,13 +454,21 @@
         
         // Delete medicine
         async function deleteMedicine(index, name) {
+            const apiKey = ensureApiKey(); // Ensure API key is available
+            if (!apiKey) {
+                showMessage("API Key is required to perform this action.", "error");
+                return;
+            }
             if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
             
             const disease = document.getElementById('diseaseSelect').value;
             
             try {
                 const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        [API_KEY_NAME]: apiKey // Pass the API key
+                    }
                 });
                 
                 if (!response.ok) throw new Error('Failed to delete medicine');
@@ -408,6 +483,12 @@
         // Handle form submission
         document.getElementById('medicineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const apiKey = ensureApiKey(); // Ensure API key is available
+            if (!apiKey) {
+                showMessage("API Key is required to perform this action.", "error");
+                return;
+            }
             
             const disease = document.getElementById('diseaseSelect').value;
             if (!disease) {
@@ -442,7 +523,8 @@
                 const response = await fetch(url, {
                     method: method,
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        [API_KEY_NAME]: apiKey // Pass the API key
                     },
                     body: JSON.stringify(formData)
                 });

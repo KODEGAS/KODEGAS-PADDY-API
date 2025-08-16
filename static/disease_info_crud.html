@@ -3,112 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disease Info CRUD Manager</title>
+    <title>Disease Info Manager</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #28a745;
+        }
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #6c757d;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        nav a:hover {
+            background-color: #5a6268;
         }
         .container {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
-        h1, h2 {
-            color: #333;
+        h2 {
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 0;
         }
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
             margin-bottom: 20px;
         }
         select, input, button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
             border-radius: 4px;
+            font-size: 1em;
         }
         button {
-            background: #007bff;
+            background: #28a745;
             color: white;
             cursor: pointer;
             border: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         button:hover {
-            background: #0056b3;
+            background: #218838;
+        }
+        fieldset {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        legend {
+            font-weight: 600;
+            color: #28a745;
+            padding: 0 10px;
         }
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 500; color: #495057; }
         .form-group input, .form-group textarea {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .loading {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
             padding: 10px;
+            border: 1px solid #ced4da;
             border-radius: 4px;
-            margin: 10px 0;
         }
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-        .nav-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            background: #6c757d;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .loading, .error, .success {
+            padding: 15px;
             border-radius: 5px;
+            margin: 10px 0;
         }
-        .nav-link:hover {
-            background: #5a6268;
-        }
+        .loading { text-align: center; color: #6c757d; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
+    <header>
+        <h1>🌿 Disease Info Manager</h1>
+        <nav>
+            <a href="/static/api_data.html">Data Hub</a>
+            <a href="/static/crud.html">Manage Medicines</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <h1>🌿 Disease Info CRUD Manager</h1>
-        <a href="/static/crud.html" class="nav-link">Switch to Medicines Manager</a>
-        
+        <h2>Control Panel</h2>
         <div class="controls">
             <label for="diseaseSelect">Select Disease:</label>
             <select id="diseaseSelect">
                 <option value="">Loading...</option>
             </select>
+        </div>
+        <div class="controls" style="margin-top: 15px;"></div>
+            <label for="apiKeyInput">API Key:</label>
+            <input type="password" id="apiKeyInput" placeholder="Enter API Key">
+            <button onclick="saveApiKey()">💾 Save API Key</button>
         </div>
 
         <div id="messages"></div>
@@ -117,50 +139,63 @@
     <div class="container" id="formContainer" style="display: none;">
         <h2 id="formTitle">Edit Disease Info</h2>
         <form id="diseaseInfoForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="f_disease_name">Disease Name *</label>
-                    <input type="text" id="f_disease_name" required>
+            <fieldset>
+                <legend>Core Details</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_disease_name">Disease Name *</label>
+                        <input type="text" id="f_disease_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_caused_by">Caused By</label>
+                        <input type="text" id="f_caused_by">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="f_caused_by">Caused By</label>
-                    <input type="text" id="f_caused_by">
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="f_description">Description *</label>
+                    <textarea id="f_description" required></textarea>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="f_description">Description *</label>
-                <textarea id="f_description" required></textarea>
-            </div>
+            </fieldset>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="f_symptoms">Symptoms (one per line)</label>
-                    <textarea id="f_symptoms"></textarea>
+            <fieldset>
+                <legend>Symptoms & Factors</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_symptoms">Symptoms (one per line)</label>
+                        <textarea id="f_symptoms"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_factors">Contributing Factors (one per line)</label>
+                        <textarea id="f_factors"></textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="f_factors">Factors (one per line)</label>
-                    <textarea id="f_factors"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="f_prevention">Prevention (one per line)</label>
-                    <textarea id="f_prevention"></textarea>
-                </div>
-                 <div class="form-group">
-                    <label for="f_care">Care (one per line)</label>
-                    <textarea id="f_care"></textarea>
-                </div>
-            </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="f_treatment">Treatment</label>
-                <input type="text" id="f_treatment">
-            </div>
-            
-            <div class="form-group">
-                <label for="f_note">Note</label>
-                <textarea id="f_note"></textarea>
-            </div>
+            <fieldset>
+                <legend>Management & Treatment</legend>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="f_prevention">Prevention Methods (one per line)</label>
+                        <textarea id="f_prevention"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_care">Care Guidelines (one per line)</label>
+                        <textarea id="f_care"></textarea>
+                    </div>
+                </div>
+                 <div class="form-group" style="margin-top: 20px;">
+                    <label for="f_treatment">Treatment Summary</label>
+                    <input type="text" id="f_treatment">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Additional Information</legend>
+                <div class="form-group">
+                    <label for="f_note">Note</label>
+                    <textarea id="f_note"></textarea>
+                </div>
+            </fieldset>
             
             <div style="margin-top: 20px;">
                 <button type="submit">💾 Save Changes</button>
@@ -169,7 +204,43 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:8002';
+        const API_BASE = ''; // Use relative paths for API calls
+        const API_KEY_NAME = "X-API-KEY";
+        let apiKey = sessionStorage.getItem(API_KEY_NAME);
+
+        // Load API key from session storage on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedKey = sessionStorage.getItem(API_KEY_NAME);
+            if (storedKey) {
+                document.getElementById('apiKeyInput').value = storedKey;
+                apiKey = storedKey;
+            }
+        });
+
+        function saveApiKey() {
+            const inputKey = document.getElementById('apiKeyInput').value;
+            if (inputKey) {
+                sessionStorage.setItem(API_KEY_NAME, inputKey);
+                apiKey = inputKey;
+                showMessage("API Key saved!", "success");
+            } else {
+                showMessage("Please enter an API Key to save.", "error");
+            }
+        }
+
+        function ensureApiKey() {
+            if (!apiKey) {
+                const inputKey = document.getElementById('apiKeyInput').value;
+                if (inputKey) {
+                    sessionStorage.setItem(API_KEY_NAME, inputKey);
+                    apiKey = inputKey;
+                } else {
+                    showMessage("Please enter your API Key in the input field.", "error");
+                    return null;
+                }
+            }
+            return apiKey;
+        }
         
         function showMessage(message, type = 'success') {
             const messagesDiv = document.getElementById('messages');
@@ -239,6 +310,12 @@
         
         document.getElementById('diseaseInfoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const apiKey = ensureApiKey(); // Ensure API key is available
+            if (!apiKey) {
+                showMessage("API Key is required to perform this action.", "error");
+                return;
+            }
             
             const diseaseKey = document.getElementById('diseaseSelect').value;
             if (!diseaseKey) {
@@ -262,7 +339,8 @@
                 const response = await fetch(`${API_BASE}/crud/disease-info/${diseaseKey}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        [API_KEY_NAME]: apiKey // Pass the API key
                     },
                     body: JSON.stringify(formData)
                 });
