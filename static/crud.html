@@ -130,7 +130,7 @@
     </div>
 
     <script>
-        const API_BASE = ''; // Use relative paths for API calls
+        const API_BASE = 'http://127.0.0.1:8000'; // Use explicit server URL
         const API_KEY_NAME = "X-API-KEY";
         let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
@@ -258,7 +258,7 @@
                         </div>
                         <div class="medicine-actions">
                             <span class="priority-badge">Priority: ${medicine.priority || 999}</span>
-                            <button class="edit" onclick="editMedicine(${index}, ${JSON.stringify(medicine).replace(/"/g, '"')})">
+                            <button class="edit" onclick="editMedicine(${index}, '${encodeURIComponent(JSON.stringify(medicine))}')">
                                 ✏️ Edit
                             </button>
                             <button class="danger" onclick="deleteMedicine(${index}, '${medicine.name}')">
@@ -267,16 +267,29 @@
                         </div>
                     </div>
                     <div class="medicine-details">
-                        ${medicine.brand ? `<div class="detail-item"><strong>Brand:</strong> ${medicine.brand}</div>` : ''}
-                        ${medicine.type ? `<div class="detail-item"><strong>Type:</strong> ${medicine.type}</div>` : ''}
-                        ${medicine.active_ingredient ? `<div class="detail-item"><strong>Active Ingredient:</strong> ${medicine.active_ingredient}</div>` : ''}
-                        ${medicine.pack_size ? `<div class="detail-item"><strong>Pack Size:</strong> ${medicine.pack_size}</div>` : ''}
-                        ${medicine.price ? `<div class="detail-item"><strong>Price:</strong> ${medicine.price}</div>` : ''}
-                        ${medicine.application_rate ? `<div class="detail-item"><strong>Application Rate:</strong> ${medicine.application_rate}</div>` : ''}
-                        ${medicine.method ? `<div class="detail-item"><strong>Method:</strong> ${medicine.method}</div>` : ''}
-                        ${medicine.frequency ? `<div class="detail-item"><strong>Frequency:</strong> ${medicine.frequency}</div>` : ''}
-                        ${medicine.availability ? `<div class="detail-item"><strong>Availability:</strong> ${medicine.availability}</div>` : ''}
-                        ${medicine.note ? `<div class="detail-item"><strong>Note:</strong> ${medicine.note}</div>` : ''}
+                        <div class="detail-section">
+                            <h3>Basic Information</h3>
+                            ${medicine.brand ? `<div class="detail-group"><span class="detail-label">Brand:</span> <span class="detail-value">${medicine.brand}</span></div>` : ''}
+                            ${medicine.type ? `<div class="detail-group"><span class="detail-label">Type:</span> <span class="detail-value">${medicine.type}</span></div>` : ''}
+                            ${medicine.active_ingredient ? `<div class="detail-group"><span class="detail-label">Active Ingredient:</span> <span class="detail-value">${medicine.active_ingredient}</span></div>` : ''}
+                        </div>
+                        <div class="detail-section">
+                            <h3>Purchase Details</h3>
+                            ${medicine.pack_size ? `<div class="detail-group"><span class="detail-label">Pack Size:</span> <span class="detail-value">${medicine.pack_size}</span></div>` : ''}
+                            ${medicine.price ? `<div class="detail-group"><span class="detail-label">Price:</span> <span class="detail-value">Rs. ${medicine.price}</span></div>` : ''}
+                            ${medicine.availability ? `<div class="detail-group"><span class="detail-label">Availability:</span> <span class="detail-value">${medicine.availability}</span></div>` : ''}
+                        </div>
+                        <div class="detail-section">
+                            <h3>Application</h3>
+                            ${medicine.application_rate ? `<div class="detail-group"><span class="detail-label">Application Rate:</span> <span class="detail-value">${medicine.application_rate}</span></div>` : ''}
+                            ${medicine.method ? `<div class="detail-group"><span class="detail-label">Method:</span> <span class="detail-value">${medicine.method}</span></div>` : ''}
+                            ${medicine.frequency ? `<div class="detail-group"><span class="detail-label">Frequency:</span> <span class="detail-value">${medicine.frequency}</span></div>` : ''}
+                        </div>
+                        <div class="detail-section">
+                            <h3>Additional Information</h3>
+                            ${medicine.note ? `<div class="detail-group"><span class="detail-label">Note:</span> <span class="detail-value">${medicine.note}</span></div>` : ''}
+                            ${medicine.image_url ? `<div class="detail-group"><span class="detail-label">Image URL:</span> <span class="detail-value"><a href="${medicine.image_url}" target="_blank">${medicine.image_url}</a></span></div>` : ''}
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -292,11 +305,12 @@
             document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Edit medicine
-        function editMedicine(index, medicine) {
-            document.getElementById('formContainer').style.display = 'block';
-            document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
-            document.getElementById('editIndex').value = index;
+// Edit medicine
+function editMedicine(index, medicineString) {
+    const medicine = JSON.parse(decodeURIComponent(medicineString)); // Decode and parse the stringified JSON
+    document.getElementById('formContainer').style.display = 'block';
+    document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
+    document.getElementById('editIndex').value = index;
 
             // Populate form fields
             const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
