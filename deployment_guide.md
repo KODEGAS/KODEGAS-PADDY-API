@@ -19,7 +19,7 @@ This guide will walk you through deploying your Paddy Disease API application on
     *   **Virtual machine name**: Give it a name (e.g., `paddy-api-vm`).
     *   **Region**: Choose a region close to you.
     *   **Image**: Select **Ubuntu Server 22.04 LTS**.
-    *   **Size**: The free tier `B1s` size is usually sufficient to start.
+    *   **Size**: Select the **Standard_B1s** size. This is a burstable VM that is typically included in the Azure free tier and covered by your "Azure for Students" credits. It provides 1 vCPU and 1 GiB of memory, which is sufficient for this application. Avoid larger sizes like `D2s_v3` to stay within your free credits.
     *   **Authentication type**: Select **"SSH public key"**.
     *   **SSH public key**: Provide your public SSH key. If you don't have one, you can generate it on your local machine using `ssh-keygen -t rsa -b 2048`.
 3.  **Configure Networking**:
