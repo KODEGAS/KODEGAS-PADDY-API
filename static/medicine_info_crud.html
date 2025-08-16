@@ -305,12 +305,12 @@
             document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         }
 
-// Edit medicine
-function editMedicine(index, medicineString) {
-    const medicine = JSON.parse(decodeURIComponent(medicineString)); // Decode and parse the stringified JSON
-    document.getElementById('formContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
-    document.getElementById('editIndex').value = index;
+        // Edit medicine
+        function editMedicine(index, medicineString) {
+            const medicine = JSON.parse(decodeURIComponent(medicineString)); // Decode and parse the stringified JSON
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
+            document.getElementById('editIndex').value = index;
 
             // Populate form fields
             const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
