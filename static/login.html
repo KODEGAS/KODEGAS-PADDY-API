@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Rice Disease Admin - Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>🌾 Rice Disease Admin</h1>
+            <p>Please login to manage disease information</p>
+
+            <div id="error-message" class="error hidden"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+
+            <div class="login-info">
+                <p><strong>Default credentials:</strong></p>
+                <p>Username: admin</p>
+                <p>Password: rice123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+
+            try {
+                const credentials = btoa(username + ':' + password);
+                const response = await fetch('/admin/dashboard', {
+                    headers: {
+                        'Authorization': 'Basic ' + credentials
+                    }
+                });
+
+                if (response.ok) {
+                    // Store credentials for future requests
+                    sessionStorage.setItem('auth', credentials);
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    errorDiv.textContent = 'Invalid username or password';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Login failed. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

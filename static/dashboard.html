@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Rice Disease Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>🌾 Rice Disease Admin Dashboard</h1>
+            <button onclick="logout()" class="btn btn-secondary">Logout</button>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('disease-info')">Disease Information</button>
+            <button class="tab-button" onclick="showTab('medicines')">Medicines</button>
+        </div>
+
+        <!-- Disease Information Tab -->
+        <div id="disease-info" class="tab-content active">
+            <div class="section-header">
+                <h2>Disease Information Management</h2>
+                <button onclick="showAddForm('info')" class="btn btn-primary">Add New Disease</button>
+            </div>
+
+            <div id="disease-info-list" class="data-list"></div>
+
+            <!-- Add/Edit Form for Disease Info -->
+            <div id="disease-info-form" class="modal hidden">
+                <div class="modal-content">
+                    <h3 id="info-form-title">Add Disease Information</h3>
+                    <form id="diseaseInfoForm">
+                        <div class="form-group">
+                            <label>Disease Key:</label>
+                            <input type="text" id="info-disease-key" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Disease Name:</label>
+                            <input type="text" id="info-disease-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Caused By:</label>
+                            <input type="text" id="info-caused-by" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="info-description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Symptoms (one per line):</label>
+                            <textarea id="info-symptoms" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Factors (one per line):</label>
+                            <textarea id="info-factors" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Prevention (one per line):</label>
+                            <textarea id="info-prevention" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Treatment:</label>
+                            <textarea id="info-treatment" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Note:</label>
+                            <textarea id="info-note" rows="2"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" onclick="hideForm('info')" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medicines Tab -->
+        <div id="medicines" class="tab-content">
+            <div class="section-header">
+                <h2>Disease Medicines Management</h2>
+                <button onclick="showAddForm('medicines')" class="btn btn-primary">Add New Medicine Set</button>
+            </div>
+
+            <div id="medicines-list" class="data-list"></div>
+
+            <!-- Add/Edit Form for Medicines -->
+            <div id="medicines-form" class="modal hidden">
+                <div class="modal-content large-modal">
+                    <h3 id="medicines-form-title">Add Medicine Set</h3>
+                    <form id="medicinesForm">
+                        <div class="form-group">
+                            <label>Disease Key:</label>
+                            <input type="text" id="med-disease-key" required>
+                        </div>
+                        <div id="medicines-container" class="sortable-container">
+                            <div class="medicine-item" draggable="true">
+                                <div class="medicine-header">
+                                    <h4>Medicine 1</h4>
+                                    <div class="medicine-controls">
+                                        <button type="button" class="btn btn-sm move-up"
+                                            onclick="moveMedicine(this, 'up')">↑</button>
+                                        <button type="button" class="btn btn-sm move-down"
+                                            onclick="moveMedicine(this, 'down')">↓</button>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            onclick="removeMedicineItem(this)">×</button>
+                                    </div>
+                                </div>
+
+                                <!-- Basic Info -->
+                                <div class="form-section">
+                                    <h5>Basic Information</h5>
+                                    <div class="form-row">
+                                        <input type="text" placeholder="Medicine Name *" class="med-name" required>
+                                        <input type="text" placeholder="Brand" class="med-brand">
+                                        <input type="text" placeholder="Type" class="med-type">
+                                    </div>
+                                    <div class="form-row">
+                                        <input type="text" placeholder="Active Ingredient" class="med-ingredient">
+                                        <input type="text" placeholder="Pack Size" class="med-pack">
+                                        <input type="text" placeholder="Price (Rs. 1200)" class="med-price">
+                                    </div>
+                                </div>
+
+                                <!-- Application Details -->
+                                <div class="form-section">
+                                    <h5>Application Details</h5>
+                                    <div class="form-row">
+                                        <input type="text" placeholder="Application Rate" class="med-rate">
+                                        <input type="text" placeholder="Frequency" class="med-frequency">
+                                        <input type="number" placeholder="Priority (1-10)" class="med-priority" min="1"
+                                            max="10">
+                                    </div>
+                                    <textarea placeholder="Method of Application" class="med-method"
+                                        rows="2"></textarea>
+                                </div>
+
+                                <!-- Additional Info -->
+                                <div class="form-section">
+                                    <h5>Additional Information</h5>
+                                    <div class="form-row">
+                                        <input type="url" placeholder="Image URL (optional)" class="med-image">
+                                        <input type="text" placeholder="Availability" class="med-availability">
+                                    </div>
+                                    <textarea placeholder="Notes and Warnings" class="med-note" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-extended">
+                            <button type="button" onclick="addMedicineItem()" class="btn btn-secondary">+ Add
+                                Medicine</button>
+                            <button type="button" onclick="sortMedicinesByPriority()" class="btn btn-info">Sort by
+                                Priority</button>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" onclick="hideForm('medicines')"
+                                class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+
+</html>

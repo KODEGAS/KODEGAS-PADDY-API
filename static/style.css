@@ -1,0 +1,923 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Login Styles */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2em;
+}
+
+.login-box p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.login-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Dashboard Styles */
+.dashboard {
+    background: white;
+    min-height: 100vh;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.8em;
+}
+
+/* Tabs */
+.tabs {
+    background: #34495e;
+    display: flex;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button.active {
+    background: white;
+    color: #34495e;
+}
+
+.tab-content {
+    display: none;
+    padding: 30px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Section Header */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.section-header h2 {
+    color: #2c3e50;
+    font-size: 1.5em;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+/* Data List */
+.data-list {
+    display: grid;
+    gap: 20px;
+}
+
+.data-item {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.3s;
+}
+
+.data-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.data-item h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.data-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.data-item-actions .btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* Medicine Item */
+.medicine-item {
+    background: #f1f3f4;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.medicine-item h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+}
+
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #c3e6cb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+}
+
+/ * Mobile-First Responsive Design */
+/* Small phones (320px and up) */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .login-container {
+        padding: 10px;
+    }
+
+    .login-box {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .login-box h1 {
+        font-size: 1.5em;
+    }
+
+    header {
+        padding: 15px 10px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 1.3em;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab-button {
+        padding: 12px 15px;
+        font-size: 0.9em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-content {
+        padding: 15px 10px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .section-header h2 {
+        font-size: 1.2em;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .modal-content {
+        padding: 20px 15px;
+        margin: 10px;
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 40px);
+    }
+
+    .data-item {
+        padding: 15px;
+    }
+
+    .data-item h3 {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .data-item-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .data-item-actions .btn {
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .medicine-item {
+        padding: 15px;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        font-size: 0.9em;
+        min-height: 44px;
+        /* iOS touch target */
+    }
+
+    input,
+    textarea,
+    select {
+        padding: 12px;
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+        min-height: 44px;
+    }
+}
+
+/* Large phones and small tablets (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .login-box {
+        max-width: 450px;
+    }
+
+    header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tabs {
+        flex-direction: row;
+    }
+
+    .tab-content {
+        padding: 25px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 500px;
+    }
+
+    .section-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .data-item h3 {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+}
+
+/* Tablets (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .tab-content {
+        padding: 30px 25px;
+    }
+
+    .modal-content {
+        width: 80%;
+        max-width: 600px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* Large tablets and desktops (1025px and up) */
+@media (min-width: 1025px) {
+    .tab-content {
+        padding: 30px;
+    }
+
+    .modal-content {
+        width: 70%;
+        max-width: 700px;
+    }
+}
+
+/* Touch-specific improvements */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover {
+        transform: scale(0.98);
+    }
+
+    .data-item:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .modal {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    input,
+    textarea {
+        -webkit-appearance: none;
+        border-radius: 8px;
+    }
+
+    .btn {
+        -webkit-appearance: none;
+        border-radius: 8px;
+    }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    input[type="number"] {
+        -webkit-appearance: textfield;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+    .login-container {
+        padding: 5px;
+    }
+
+    .login-box {
+        padding: 15px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        padding: 20px;
+    }
+
+    header {
+        padding: 10px 20px;
+    }
+
+    header h1 {
+        font-size: 1.2em;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    .btn {
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .login-info {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+
+    .data-item {
+        background: #34495e;
+        border-color: #2c3e50;
+        color: #ecf0f1;
+    }
+
+    .medicine-item {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+}
+
+/* Mobile-s
+pecific enhancements */
+.mobile-device .btn {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.mobile-device input,
+.mobile-device textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved touch targets */
+.mobile-device .tab-button {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-device .data-item-actions .btn {
+    min-width: 88px;
+    min-height: 40px;
+}
+
+/* Better scrolling on mobile */
+.mobile-device .modal-content {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+.mobile-device .tab-content {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile alert styles */
+.mobile-alert {
+    transition: all 0.3s ease;
+    animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Improved form layout for mobile */
+@media (max-width: 480px) {
+    .mobile-device .form-group label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .mobile-device .medicine-item h4 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .mobile-device .data-item h3 {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .mobile-device .section-header h2 {
+        font-size: 18px;
+    }
+}
+
+/* PWA-like appearance */
+@media (display-mode: standalone) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    header {
+        padding-top: calc(15px + env(safe-area-inset-top));
+    }
+}
+
+/* Improved accessibility for mobile */
+@media (max-width: 768px) {
+    .btn:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 1px;
+    }
+}
+
+/*
+ Enhanced Medicine Form Styles */
+.large-modal {
+    max-width: 900px;
+    width: 95%;
+}
+
+.medicine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+}
+
+.medicine-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-height: 28px;
+    min-width: 28px;
+}
+
+.move-up,
+.move-down {
+    background: #6c757d;
+    color: white;
+    font-weight: bold;
+}
+
+.move-up:hover,
+.move-down:hover {
+    background: #5a6268;
+}
+
+.form-section {
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.form-section h5 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-actions-extended {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #138496;
+}
+
+/* Sortable Container */
+.sortable-container {
+    min-height: 100px;
+}
+
+.medicine-item {
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: move;
+}
+
+.medicine-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.medicine-item.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.medicine-item.drag-over {
+    border-top: 3px solid #667eea;
+}
+
+/* Enhanced Medicine Display */
+.medicine-display {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.medicine-display h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.priority-badge {
+    background: #667eea;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.medicine-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.medicine-detail {
+    font-size: 14px;
+}
+
+.medicine-detail strong {
+    color: #495057;
+}
+
+/* Mobile enhancements for medicine form */
+@media (max-width: 768px) {
+    .large-modal {
+        width: 98%;
+        max-width: none;
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+    }
+
+    .medicine-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .medicine-controls {
+        justify-content: center;
+    }
+
+    .form-actions-extended {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-actions-extended .form-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .form-actions-extended .form-actions .btn {
+        flex: 1;
+    }
+
+    .medicine-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Drag and drop visual feedback */
+.drag-placeholder {
+    height: 4px;
+    background: #667eea;
+    border-radius: 2px;
+    margin: 5px 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.drag-placeholder.active {
+    opacity: 1;
+}
