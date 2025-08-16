@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disease Info Manager</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <header>
         <h1>🌿 Disease Info Manager</h1>
         <nav>
             <a href="/static/api_data.html">Data Hub</a>
-            <a href="/static/crud.html">Manage Medicines</a>
+            <a href="/static/medicine_info_crud.html">Manage Medicines</a>
         </nav>
     </header>
 
@@ -24,12 +26,12 @@
             </select>
         </div>
         <div class="controls" style="margin-top: 15px;"></div>
-            <label for="apiKeyInput">API Key:</label>
-            <input type="password" id="apiKeyInput" placeholder="Enter API Key">
-            <button onclick="saveApiKey()">💾 Save API Key</button>
-        </div>
+        <label for="apiKeyInput">API Key:</label>
+        <input type="password" id="apiKeyInput" placeholder="Enter API Key">
+        <button onclick="saveApiKey()">💾 Save API Key</button>
+    </div>
 
-        <div id="messages"></div>
+    <div id="messages"></div>
     </div>
 
     <div class="container" id="formContainer" style="display: none;">
@@ -79,7 +81,7 @@
                         <textarea id="f_care"></textarea>
                     </div>
                 </div>
-                 <div class="form-group" style="margin-top: 20px;">
+                <div class="form-group" style="margin-top: 20px;">
                     <label for="f_treatment">Treatment Summary</label>
                     <input type="text" id="f_treatment">
                 </div>
@@ -92,7 +94,7 @@
                     <textarea id="f_note"></textarea>
                 </div>
             </fieldset>
-            
+
             <div style="margin-top: 20px;">
                 <button type="submit">💾 Save Changes</button>
             </div>
@@ -137,7 +139,7 @@
             }
             return apiKey;
         }
-        
+
         function showMessage(message, type = 'success') {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = `<div class="${type}">${message}</div>`;
@@ -155,16 +157,16 @@
                 field.classList.add('invalid');
             }
         }
-        
+
         async function loadDiseases() {
             try {
                 const response = await fetch(`${API_BASE}/crud/disease-info`);
                 if (!response.ok) throw new Error('Failed to load disease list');
-                
+
                 const data = await response.json();
                 const select = document.getElementById('diseaseSelect');
                 select.innerHTML = '<option value="">Select a disease to edit...</option>';
-                
+
                 data.available_diseases.forEach(disease => {
                     const option = document.createElement('option');
                     option.value = disease;
@@ -175,17 +177,17 @@
                 showMessage('Error loading diseases: ' + error.message, 'error');
             }
         }
-        
+
         async function loadDiseaseInfo(diseaseKey) {
             if (!diseaseKey) {
                 document.getElementById('formContainer').style.display = 'none';
                 return;
             }
-            
+
             try {
                 const response = await fetch(`${API_BASE}/crud/disease-info/${diseaseKey}`);
                 if (!response.ok) throw new Error('Failed to load disease information');
-                
+
                 const data = await response.json();
                 populateForm(data.data);
                 document.getElementById('formContainer').style.display = 'block';
@@ -193,10 +195,10 @@
                 showMessage('Error loading disease info: ' + error.message, 'error');
             }
         }
-        
+
         function populateForm(info) {
             document.getElementById('formTitle').textContent = `Edit Info for: ${info.disease_name}`;
-            
+
             const fields = ['disease_name', 'caused_by', 'description', 'treatment', 'note'];
             fields.forEach(field => {
                 const element = document.getElementById('f_' + field);
@@ -213,7 +215,7 @@
                 }
             });
         }
-        
+
         document.getElementById('diseaseInfoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -270,13 +272,13 @@
                 showMessage("API Key is required to perform this action.", "error");
                 return;
             }
-            
+
             const diseaseKey = document.getElementById('diseaseSelect').value;
             if (!diseaseKey) {
                 showMessage('Please select a disease first!', 'error');
                 return;
             }
-            
+
             const formData = {
                 disease_name: document.getElementById('f_disease_name').value,
                 caused_by: document.getElementById('f_caused_by').value || null,
@@ -288,7 +290,7 @@
                 prevention: document.getElementById('f_prevention').value.split('\n').filter(line => line.trim() !== ''),
                 care: document.getElementById('f_care').value.split('\n').filter(line => line.trim() !== '')
             };
-            
+
             try {
                 const response = await fetch(`${API_BASE}/crud/disease-info/${diseaseKey}`, {
                     method: 'PUT',
@@ -298,23 +300,24 @@
                     },
                     body: JSON.stringify(formData)
                 });
-                
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.detail || 'Failed to save disease info');
                 }
-                
+
                 showMessage(`Disease info for "${formData.disease_name}" updated successfully!`);
             } catch (error) {
                 showMessage('Error saving disease info: ' + error.message, 'error');
             }
         });
-        
+
         document.getElementById('diseaseSelect').addEventListener('change', (e) => {
             loadDiseaseInfo(e.target.value);
         });
-        
+
         loadDiseases();
     </script>
 </body>
+
 </html>

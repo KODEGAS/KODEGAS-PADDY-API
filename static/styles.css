@@ -182,3 +182,92 @@ legend {
 .disease-info-link {
     background-color: #4CAF50; /* Earthy green */
 }
+
+/* New styles for medicine items */
+.medicine-item {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.medicine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.medicine-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #333;
+}
+
+.medicine-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.priority-badge {
+    background-color: #ffc107; /* Amber */
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.medicine-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.detail-section {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08); /* Added subtle shadow for "box" effect */
+}
+
+.detail-section h3 {
+    font-size: 1.1em;
+    color: #4CAF50; /* Earthy green */
+    margin-top: 0;
+    margin-bottom: 12px; /* Increased margin */
+    padding-bottom: 8px; /* Increased padding */
+    border-bottom: 1px dashed #d0d0d0; /* Slightly darker dashed border */
+}
+
+.detail-group {
+    display: flex;
+    align-items: baseline; /* Align items to their text baseline */
+    margin-bottom: 10px; /* Increased margin for "row" separation */
+    padding: 5px 0; /* Added vertical padding for each row */
+    border-bottom: 1px dotted #f0f0f0; /* Subtle dotted line for row separation */
+    font-size: 0.95em;
+}
+
+.detail-group:last-child {
+    margin-bottom: 0;
+    border-bottom: none; /* No border for the last row in a section */
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+    flex-basis: 120px; /* Fixed width for labels */
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #333;
+    flex-grow: 1;
+}
