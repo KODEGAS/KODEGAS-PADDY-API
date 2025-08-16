@@ -27,7 +27,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 origins = [
     "http://localhost",
     "http://localhost:8002",
-    "https://your-domain.com",  # Placeholder for your production domain
 ]
 
 app.add_middleware(

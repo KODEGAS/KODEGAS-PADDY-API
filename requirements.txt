@@ -5,3 +5,4 @@ tensorflow
 pillow
 numpy>=1.24.0
 pydantic>=2.0.0
+gunicorn==22.0.0
