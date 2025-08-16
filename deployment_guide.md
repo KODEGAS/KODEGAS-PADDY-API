@@ -182,3 +182,43 @@ You can automate the update process using GitHub Actions. This will automaticall
 2.  **Commit the Workflow File**: The `.github/workflows/deploy.yml` file has already been created for you. Commit and push it to your repository.
 
 Now, every time you push a change to your `main` branch, the GitHub Actions workflow will automatically connect to your VM, pull the latest code, and redeploy your application.
+
+---
+
+### Step 8: Setting Up SSL with Certbot (Free HTTPS)
+
+Securing your application with HTTPS is crucial for production. We'll use Certbot with Let's Encrypt to get a free SSL certificate.
+
+1.  **Install Certbot**: Connect to your VM via SSH and run the following commands to install Certbot and its Nginx plugin.
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y certbot python3-certbot-nginx
+    ```
+
+2.  **Verify Firewall Rules**: The error you encountered indicates a firewall issue. Let's ensure your Azure firewall allows HTTP and HTTPS traffic.
+    *   Go to the **Azure Portal** and navigate to your virtual machine.
+    *   In the left menu, click on **"Networking"**.
+    *   Look at the **"Inbound port rules"**. You must have rules that allow traffic for both **HTTP (port 80)** and **HTTPS (port 443)**.
+    *   If they are missing, click **"Add inbound port rule"** and create them:
+        *   **Source**: `Any`
+        *   **Source port ranges**: `*`
+        *   **Destination**: `Any`
+        *   **Service**: `HTTP` (or select `TCP` and port `80`)
+        *   **Action**: `Allow`
+        *   **Priority**: A number like `300`
+        *   **Name**: `Allow-HTTP`
+    *   Repeat the process for **HTTPS (port 443)**.
+
+3.  **Run Certbot**: Once you've confirmed the firewall rules are in place, run Certbot. It will automatically detect your domain from your Nginx configuration, obtain a certificate, and configure Nginx for you.
+    ```bash
+    sudo certbot --nginx -d kodegas-paddy-api.centralindia.cloudapp.azure.com
+    ```
+    *   Certbot will ask for your email address and for you to agree to the terms of service.
+    *   When prompted, choose to **redirect HTTP traffic to HTTPS**. This is the recommended option for security.
+
+4.  **Verify Automatic Renewal**: Certbot automatically sets up a scheduled task to renew your certificate before it expires. You can test the renewal process with this command:
+    ```bash
+    sudo certbot renew --dry-run
+    ```
+
+Your application should now be accessible via `https://kodegas-paddy-api.centralindia.cloudapp.azure.com`, and all traffic will be securely encrypted.

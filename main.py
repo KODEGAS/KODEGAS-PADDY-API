@@ -42,7 +42,7 @@ app.add_middleware(
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def root():
-    return "<h1>KODEGAS</h1>"
+    return '<div class="hub-container"><h1>KODEGAS</h1></div>'
 
 
 MODEL_PATH = "mymodel"
