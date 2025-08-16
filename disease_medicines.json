@@ -302,37 +302,5 @@
             "priority": 2,
             "note": "Highly effective but costly. Use only in severe cases or seed multiplication fields."
         }
-    ],
-    "hipsa": [
-        {
-            "name": "string",
-            "brand": "string",
-            "type": "string",
-            "active_ingredient": "string",
-            "pack_size": "string",
-            "price": "string",
-            "image_url": "string",
-            "application_rate": "string",
-            "method": "string",
-            "frequency": "string",
-            "availability": "string",
-            "priority": 999,
-            "note": "string"
-        },
-        {
-            "name": "sss",
-            "brand": "string",
-            "type": "string",
-            "active_ingredient": "string",
-            "pack_size": "string",
-            "price": "string",
-            "image_url": "string",
-            "application_rate": "string",
-            "method": "string",
-            "frequency": "string",
-            "availability": "string",
-            "priority": 999,
-            "note": "string"
-        }
     ]
 }
