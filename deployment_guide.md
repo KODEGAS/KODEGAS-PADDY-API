@@ -1,0 +1,130 @@
+# Production Deployment Guide: FastAPI on Azure VM with Nginx
+
+This guide will walk you through deploying your Paddy Disease API application on an Azure Virtual Machine (VM) using Docker and Nginx as a reverse proxy.
+
+### Prerequisites
+
+- **GitHub Student Developer Pack**: Ensure you have activated it.
+- **Azure for Students**: You will use this to create your resources. If you haven't activated it, sign up here: [https://azure.microsoft.com/en-us/free/students/](https://azure.microsoft.com/en-us/free/students/)
+
+---
+
+### Step 1: Create an Azure Virtual Machine
+
+1.  **Sign in to the Azure Portal**: [https://portal.azure.com/](https://portal.azure.com/)
+2.  **Create a Virtual Machine**:
+    *   Click on **"Create a resource"** and search for **"Virtual machine"**.
+    *   **Subscription**: Choose your "Azure for Students" subscription.
+    *   **Resource group**: Create a new one (e.g., `paddy-api-rg`).
+    *   **Virtual machine name**: Give it a name (e.g., `paddy-api-vm`).
+    *   **Region**: Choose a region close to you.
+    *   **Image**: Select **Ubuntu Server 22.04 LTS**.
+    *   **Size**: The free tier `B1s` size is usually sufficient to start.
+    *   **Authentication type**: Select **"SSH public key"**.
+    *   **SSH public key**: Provide your public SSH key. If you don't have one, you can generate it on your local machine using `ssh-keygen -t rsa -b 2048`.
+3.  **Configure Networking**:
+    *   Go to the **"Networking"** tab.
+    *   Under **"NIC network security group"**, click **"Advanced"**.
+    *   Click **"Create new"** to configure the inbound rules.
+    *   Add inbound rules to allow traffic on these ports:
+        *   **Port 22 (SSH)**: To connect to your VM.
+        *   **Port 80 (HTTP)**: For web traffic.
+        *   **Port 443 (HTTPS)**: For secure web traffic (optional, for later).
+4.  **Review and Create**: Click **"Review + create"** and then **"Create"**. Azure will deploy your VM.
+
+---
+
+### Step 2: Connect to Your VM and Install Dependencies
+
+1.  **Find your VM's IP Address**: In the Azure portal, go to your VM's overview page and copy the "Public IP address".
+2.  **Connect via SSH**: Open a terminal on your local machine and connect using:
+    ```bash
+    ssh <your-username>@<your-vm-ip-address>
+    ```
+3.  **Install Docker**: Run the following commands to install Docker, which will be used to run your application container.
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y docker.io
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker $USER 
+    # You may need to log out and log back in for the group change to take effect.
+    ```
+4.  **Install Nginx**: This will act as our reverse proxy.
+    ```bash
+    sudo apt-get install -y nginx
+    sudo systemctl start nginx
+    ```
+
+---
+
+### Step 3: Deploy Your Application
+
+1.  **Clone Your Repository**: Clone your application code from GitHub onto the VM.
+    ```bash
+    git clone https://github.com/kavindus0/paddy_disease_api.git
+    cd paddy_disease_api
+    ```
+2.  **Build the Docker Image**: Your repository already contains a `Dockerfile`. Build the image from it.
+    ```bash
+    docker build -t paddy-api-image .
+    ```
+3.  **Run the Docker Container**: Run your application inside a Docker container. This command starts the container in detached mode and maps port 8000 inside the container to port 8000 on the VM.
+    ```bash
+    docker run -d --name paddy-api-container -p 127.0.0.1:8000:8000 paddy-api-image
+    ```
+    *Note: We bind to `127.0.0.1` (localhost) on the VM because we only want Nginx to be able to access it directly. The outside world will go through Nginx.*
+
+---
+
+### Step 4: Configure Nginx as a Reverse Proxy
+
+Nginx will listen for public traffic on port 80 and forward it to your application running on port 8000.
+
+1.  **Create an Nginx Configuration File**:
+    ```bash
+    sudo nano /etc/nginx/sites-available/paddy_disease_api
+    ```
+2.  **Add the following configuration**: This tells Nginx to pass requests to your Gunicorn server.
+    ```nginx
+    server {
+        listen 80;
+        server_name <your-vm-ip-address>; # Or your domain name if you have one
+
+        location / {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+    ```
+3.  **Enable the Configuration**:
+    *   Disable the default Nginx configuration:
+        ```bash
+        sudo rm /etc/nginx/sites-enabled/default
+        ```
+    *   Create a symbolic link to enable your new configuration:
+        ```bash
+        sudo ln -s /etc/nginx/sites-available/paddy_disease_api /etc/nginx/sites-enabled/
+        ```
+4.  **Test and Restart Nginx**:
+    *   Check for syntax errors in your Nginx configuration:
+        ```bash
+        sudo nginx -t
+        ```
+    *   If the test is successful, restart Nginx to apply the changes:
+        ```bash
+        sudo systemctl restart nginx
+        ```
+
+---
+
+### Step 5: Access Your Application
+
+You should now be able to access your application by navigating to your VM's public IP address in a web browser.
+
+`http://<your-vm-ip-address>`
+
+Congratulations, your application is now deployed and ready for production!
