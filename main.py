@@ -3,7 +3,7 @@
 from fastapi import FastAPI, UploadFile, File, Query, Path, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field, validator
 from auth import get_api_key
 import tensorflow as tf
@@ -27,6 +27,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 origins = [
     "http://localhost",
     "http://localhost:8002",
+    "http://20.193.249.6",
+    "http://kodegas-paddy-api.centralindia.cloudapp.azure.com",
 ]
 
 app.add_middleware(
@@ -38,9 +40,9 @@ app.add_middleware(
 )
 
 
-@app.get("/", include_in_schema=False)
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def root():
-    return FileResponse("static/api_data.html")
+    return "<h1>KODEGAS</h1>"
 
 
 MODEL_PATH = "mymodel"
