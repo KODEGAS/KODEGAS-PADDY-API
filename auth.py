@@ -2,8 +2,6 @@ from fastapi import Security, HTTPException, status
 from fastapi.security import APIKeyHeader
 import os
 
-# For simplicity, we'll use a hardcoded key here.
-# In a production environment, it's highly recommended to use environment variables.
 # Example: API_KEY = os.environ.get("API_KEY")
 API_KEY = "your-secret-api-key"
 API_KEY_NAME = "X-API-KEY"
