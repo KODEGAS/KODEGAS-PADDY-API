@@ -4,111 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disease Info Manager</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #28a745;
-        }
-        nav a {
-            text-decoration: none;
-            color: #fff;
-            background-color: #6c757d;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        nav a:hover {
-            background-color: #5a6268;
-        }
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #495057;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
-        .controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        select, input, button {
-            padding: 10px 15px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        button {
-            background: #28a745;
-            color: white;
-            cursor: pointer;
-            border: none;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background: #218838;
-        }
-        fieldset {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        legend {
-            font-weight: 600;
-            color: #28a745;
-            padding: 0 10px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 5px; font-weight: 500; color: #495057; }
-        .form-group input, .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .form-group textarea { resize: vertical; min-height: 120px; }
-        .loading, .error, .success {
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .loading { text-align: center; color: #6c757d; }
-        .error { background: #f8d7da; color: #721c24; }
-        .success { background: #d4edda; color: #155724; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -161,8 +57,8 @@
                 <legend>Symptoms & Factors</legend>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="f_symptoms">Symptoms (one per line)</label>
-                        <textarea id="f_symptoms"></textarea>
+                        <label for="f_symptoms">Symptoms (one per line) *</label>
+                        <textarea id="f_symptoms" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_factors">Contributing Factors (one per line)</label>
@@ -175,8 +71,8 @@
                 <legend>Management & Treatment</legend>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="f_prevention">Prevention Methods (one per line)</label>
-                        <textarea id="f_prevention"></textarea>
+                        <label for="f_prevention">Prevention Methods (one per line) *</label>
+                        <textarea id="f_prevention" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_care">Care Guidelines (one per line)</label>
@@ -249,6 +145,16 @@
                 messagesDiv.innerHTML = '';
             }, 5000);
         }
+
+        // Highlight invalid fields
+        function highlightField(fieldId, isValid) {
+            const field = document.getElementById(fieldId);
+            if (isValid) {
+                field.classList.remove('invalid');
+            } else {
+                field.classList.add('invalid');
+            }
+        }
         
         async function loadDiseases() {
             try {
@@ -310,6 +216,54 @@
         
         document.getElementById('diseaseInfoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const diseaseNameField = document.getElementById('f_disease_name');
+            const descriptionField = document.getElementById('f_description');
+            const symptomsField = document.getElementById('f_symptoms');
+            const preventionField = document.getElementById('f_prevention');
+
+            const diseaseName = diseaseNameField.value.trim();
+            const description = descriptionField.value.trim();
+            const symptoms = symptomsField.value.trim();
+            const prevention = preventionField.value.trim();
+
+            let isValid = true;
+
+            if (!diseaseName) {
+                showMessage('Disease Name is a required field.', 'error');
+                highlightField('f_disease_name', false);
+                isValid = false;
+            } else {
+                highlightField('f_disease_name', true);
+            }
+
+            if (!description) {
+                showMessage('Description is a required field.', 'error');
+                highlightField('f_description', false);
+                isValid = false;
+            } else {
+                highlightField('f_description', true);
+            }
+
+            if (!symptoms) {
+                showMessage('Symptoms are a required field.', 'error');
+                highlightField('f_symptoms', false);
+                isValid = false;
+            } else {
+                highlightField('f_symptoms', true);
+            }
+
+            if (!prevention) {
+                showMessage('Prevention Methods are a required field.', 'error');
+                highlightField('f_prevention', false);
+                isValid = false;
+            } else {
+                highlightField('f_prevention', true);
+            }
+
+            if (!isValid) {
+                return;
+            }
 
             const apiKey = ensureApiKey(); // Ensure API key is available
             if (!apiKey) {

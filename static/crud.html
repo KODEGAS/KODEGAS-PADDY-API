@@ -4,154 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicines Manager</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #007bff;
-        }
-        nav a {
-            text-decoration: none;
-            color: #fff;
-            background-color: #6c757d;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        nav a:hover {
-            background-color: #5a6268;
-        }
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #495057;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
-        .controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        select, input, button {
-            padding: 10px 15px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        button {
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            border: none;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        button.danger { background: #dc3545; }
-        button.danger:hover { background: #c82333; }
-        button.edit { background: #28a745; }
-        button.edit:hover { background: #218838; }
-        .medicine-item {
-            border: 1px solid #e9ecef;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 5px;
-            background: #f8f9fa;
-        }
-        .medicine-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .medicine-title {
-            font-weight: 600;
-            font-size: 1.2em;
-            color: #0056b3;
-        }
-        .medicine-actions { display: flex; gap: 8px; }
-        .medicine-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            font-size: 0.95em;
-        }
-        .detail-item {
-            background: #e9ecef;
-            padding: 8px 12px;
-            border-radius: 4px;
-        }
-        .detail-item strong { color: #495057; }
-        fieldset {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        legend {
-            font-weight: 600;
-            color: #007bff;
-            padding: 0 10px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 5px; font-weight: 500; color: #495057; }
-        .form-group input, .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .form-group textarea { resize: vertical; min-height: 80px; }
-        .priority-badge {
-            background: #17a2b8;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            margin-left: 10px;
-        }
-        .loading, .error, .success {
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .loading { text-align: center; color: #6c757d; }
-        .error { background: #f8d7da; color: #721c24; }
-        .success { background: #d4edda; color: #155724; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -203,12 +56,12 @@
                         <input type="text" id="f_brand">
                     </div>
                     <div class="form-group">
-                        <label for="f_type">Type</label>
-                        <input type="text" id="f_type">
+                        <label for="f_type">Type *</label>
+                        <input type="text" id="f_type" required>
                     </div>
                     <div class="form-group">
-                        <label for="f_active_ingredient">Active Ingredient</label>
-                        <input type="text" id="f_active_ingredient">
+                        <label for="f_active_ingredient">Active Ingredient *</label>
+                        <input type="text" id="f_active_ingredient" required>
                     </div>
                 </div>
             </fieldset>
@@ -221,8 +74,8 @@
                         <input type="text" id="f_pack_size">
                     </div>
                     <div class="form-group">
-                        <label for="f_price">Price</label>
-                        <input type="text" id="f_price">
+                        <label for="f_price">Price *</label>
+                        <input type="number" id="f_price" required>
                     </div>
                     <div class="form-group">
                         <label for="f_availability">Availability</label>
@@ -321,6 +174,16 @@
                 messagesDiv.innerHTML = '';
             }, 5000);
         }
+
+        // Highlight invalid fields
+        function highlightField(fieldId, isValid) {
+            const field = document.getElementById(fieldId);
+            if (isValid) {
+                field.classList.remove('invalid');
+            } else {
+                field.classList.add('invalid');
+            }
+        }
         
         // Load available diseases
         async function loadDiseases() {
@@ -390,10 +253,10 @@
                     <div class="medicine-header">
                         <div class="medicine-title">
                             ${medicine.name} 
-                            <span class="priority-badge">Priority: ${medicine.priority || 999}</span>
                         </div>
                         <div class="medicine-actions">
-                            <button class="edit" onclick="editMedicine(${index}, ${JSON.stringify(medicine).replace(/"/g, '&quot;')})">
+                            <span class="priority-badge">Priority: ${medicine.priority || 999}</span>
+                            <button class="edit" onclick="editMedicine(${index}, ${JSON.stringify(medicine).replace(/"/g, '"')})">
                                 ✏️ Edit
                             </button>
                             <button class="danger" onclick="deleteMedicine(${index}, '${medicine.name}')">
@@ -483,6 +346,64 @@
         // Handle form submission
         document.getElementById('medicineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const nameField = document.getElementById('f_name');
+            const typeField = document.getElementById('f_type');
+            const activeIngredientField = document.getElementById('f_active_ingredient');
+            const priceField = document.getElementById('f_price');
+            const priorityField = document.getElementById('f_priority');
+
+            const name = nameField.value.trim();
+            const type = typeField.value.trim();
+            const active_ingredient = activeIngredientField.value.trim();
+            const price = priceField.value.trim();
+            const priority = priorityField.value.trim();
+
+            let isValid = true;
+
+            if (!name) {
+                showMessage('Medicine Name is a required field.', 'error');
+                highlightField('f_name', false);
+                isValid = false;
+            } else {
+                highlightField('f_name', true);
+            }
+
+            if (!type) {
+                showMessage('Type is a required field.', 'error');
+                highlightField('f_type', false);
+                isValid = false;
+            } else {
+                highlightField('f_type', true);
+            }
+
+            if (!active_ingredient) {
+                showMessage('Active Ingredient is a required field.', 'error');
+                highlightField('f_active_ingredient', false);
+                isValid = false;
+            } else {
+                highlightField('f_active_ingredient', true);
+            }
+
+            if (price && isNaN(parseFloat(price))) {
+                showMessage('Price must be a valid number.', 'error');
+                highlightField('f_price', false);
+                isValid = false;
+            } else {
+                highlightField('f_price', true);
+            }
+
+            if (priority && isNaN(parseInt(priority))) {
+                showMessage('Priority must be a valid integer.', 'error');
+                highlightField('f_priority', false);
+                isValid = false;
+            } else {
+                highlightField('f_priority', true);
+            }
+
+            if (!isValid) {
+                return;
+            }
 
             const apiKey = ensureApiKey(); // Ensure API key is available
             if (!apiKey) {

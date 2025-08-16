@@ -4,61 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Data Hub</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
-        .hub-container {
-            text-align: center;
-            background: #fff;
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-        h1 {
-            font-size: 2.5em;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        p {
-            font-size: 1.1em;
-            color: #6c757d;
-            margin-bottom: 40px;
-        }
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #fff;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 1.1em;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .nav-links a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .medicines-link {
-            background-color: #007bff;
-        }
-        .disease-info-link {
-            background-color: #28a745;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <canvas id="bg"></canvas>
     <div class="hub-container">
         <h1>Data Management Hub</h1>
         <p>Select a category to manage its data.</p>
@@ -67,5 +16,6 @@
             <a href="/static/disease_info_crud.html" class="disease-info-link">🌿 Manage Disease Info</a>
         </div>
     </div>
+
 </body>
 </html>
