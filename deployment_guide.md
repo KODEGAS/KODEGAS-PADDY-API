@@ -65,13 +65,13 @@ This guide will walk you through deploying your Paddy Disease API application on
     git clone https://github.com/kavindus0/paddy_disease_api.git
     cd paddy_disease_api
     ```
-2.  **Build the Docker Image**: Your repository already contains a `Dockerfile`. Build the image from it.
+2.  **Build the Docker Image**: Your repository already contains a `Dockerfile`. Build the image from it. You'll need to use `sudo` to grant Docker the necessary permissions.
     ```bash
-    docker build -t paddy-api-image .
+    sudo docker build -t paddy-api-image .
     ```
 3.  **Run the Docker Container**: Run your application inside a Docker container. This command starts the container in detached mode and maps port 8000 inside the container to port 8000 on the VM.
     ```bash
-    docker run -d --name paddy-api-container -p 127.0.0.1:8000:8000 paddy-api-image
+    sudo docker run -d --name paddy-api-container -p 127.0.0.1:8000:8000 paddy-api-image
     ```
     *Note: We bind to `127.0.0.1` (localhost) on the VM because we only want Nginx to be able to access it directly. The outside world will go through Nginx.*
 
@@ -128,3 +128,57 @@ You should now be able to access your application by navigating to your VM's pub
 `http://<your-vm-ip-address>`
 
 Congratulations, your application is now deployed and ready for production!
+
+---
+
+### Step 6: Updating Your Application
+
+When you want to update an HTML file or any other part of your application, follow these steps:
+
+1.  **Make Changes Locally**: Edit the files on your local machine as you normally would.
+2.  **Commit and Push to GitHub**:
+    ```bash
+    git add .
+    git commit -m "Your update message"
+    git push origin main
+    ```
+3.  **Update on the VM**:
+    *   Connect to your Azure VM via SSH.
+    *   Navigate to your project directory: `cd paddy_disease_api`
+    *   Pull the latest changes from your repository:
+        ```bash
+        git pull origin main
+        ```
+4.  **Rebuild and Restart the Docker Container**:
+    *   Stop and remove the old container:
+        ```bash
+        sudo docker stop paddy-api-container
+        sudo docker rm paddy-api-container
+        ```
+    *   Rebuild the image with your changes:
+        ```bash
+        sudo docker build -t paddy-api-image .
+        ```
+    *   Run the new container:
+        ```bash
+        sudo docker run -d --name paddy-api-container -p 127.0.0.1:8000:8000 paddy-api-image
+        ```
+
+Your updated application will now be live.
+
+---
+
+### Step 7: Automating Deployments with GitHub Actions
+
+You can automate the update process using GitHub Actions. This will automatically deploy your changes every time you push to your `main` branch.
+
+1.  **Add Secrets to Your GitHub Repository**:
+    *   Go to your repository on GitHub and click on **"Settings"** > **"Secrets and variables"** > **"Actions"**.
+    *   Click **"New repository secret"** to add the following secrets:
+        *   `AZURE_VM_HOST`: The public IP address of your Azure VM.
+        *   `AZURE_VM_USERNAME`: The username you use to SSH into your VM.
+        *   `AZURE_VM_SSH_KEY`: Your private SSH key that corresponds to the public key you added to the VM.
+
+2.  **Commit the Workflow File**: The `.github/workflows/deploy.yml` file has already been created for you. Commit and push it to your repository.
+
+Now, every time you push a change to your `main` branch, the GitHub Actions workflow will automatically connect to your VM, pull the latest code, and redeploy your application.

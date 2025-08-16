@@ -24,17 +24,20 @@ RUN apt-get update && \
 # Copy only requirements first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Create non-root user for security first
+RUN useradd --create-home --shell /bin/bash app
 
-# Copy the rest of the application code
-COPY . .
-
-# Create non-root user for security
-RUN useradd --create-home --shell /bin/bash app && \
-    chown -R app:app /app
+# Copy requirements and install as non-root user
+COPY --chown=app:app requirements.txt .
 USER app
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --user -r requirements.txt
+
+# Copy the rest of the application code as non-root user
+COPY --chown=app:app . .
+
+# Add the user's local bin to the PATH
+ENV PATH="/home/app/.local/bin:${PATH}"
 
 # Expose the application port
 EXPOSE 8000
