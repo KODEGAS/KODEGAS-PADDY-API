@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicines Manager</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <header>
         <h1>🌾 Medicines Manager</h1>
@@ -45,7 +43,7 @@
         <h2 id="formTitle">➕ Add New Medicine</h2>
         <form id="medicineForm">
             <input type="hidden" id="editIndex" value="-1">
-
+            
             <fieldset>
                 <legend>Basic Information</legend>
                 <div class="form-grid">
@@ -121,7 +119,7 @@
                     </div>
                 </div>
             </fieldset>
-
+            
             <div style="margin-top: 20px;">
                 <button type="submit">💾 Save Medicine</button>
                 <button type="button" onclick="cancelEdit()">❌ Cancel</button>
@@ -167,7 +165,7 @@
             }
             return apiKey;
         }
-
+        
         // Show messages to user
         function showMessage(message, type = 'success') {
             const messagesDiv = document.getElementById('messages');
@@ -186,24 +184,24 @@
                 field.classList.add('invalid');
             }
         }
-
+        
         // Load available diseases
         async function loadDiseases() {
             try {
                 const response = await fetch(`${API_BASE}/medicines`);
                 if (!response.ok) throw new Error('Failed to load diseases');
-
+                
                 const data = await response.json();
                 const select = document.getElementById('diseaseSelect');
                 select.innerHTML = '<option value="">Select a disease...</option>';
-
+                
                 data.available_diseases.forEach(disease => {
                     const option = document.createElement('option');
                     option.value = disease;
                     option.textContent = disease.replace(/_/g, ' ').toUpperCase();
                     select.appendChild(option);
                 });
-
+                
                 // Auto-select first disease if available
                 if (data.available_diseases.length > 0) {
                     select.value = data.available_diseases[0];
@@ -213,7 +211,7 @@
                 showMessage('Error loading diseases: ' + error.message, 'error');
             }
         }
-
+        
         // Refresh medicines list
         async function refreshList() {
             const disease = document.getElementById('diseaseSelect').value;
@@ -221,9 +219,9 @@
                 document.getElementById('medicinesList').innerHTML = '<p>Please select a disease first.</p>';
                 return;
             }
-
+            
             document.getElementById('medicinesList').innerHTML = '<div class="loading">Loading medicines...</div>';
-
+            
             try {
                 const response = await fetch(`${API_BASE}/medicines/${disease}`);
                 if (!response.ok) {
@@ -233,23 +231,23 @@
                     }
                     throw new Error('Failed to load medicines');
                 }
-
+                
                 const data = await response.json();
                 displayMedicines(data.medicines);
             } catch (error) {
                 document.getElementById('medicinesList').innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
         }
-
+        
         // Display medicines in the UI
         function displayMedicines(medicines) {
             const container = document.getElementById('medicinesList');
-
+            
             if (medicines.length === 0) {
                 container.innerHTML = '<p>No medicines found for this disease.</p>';
                 return;
             }
-
+            
             container.innerHTML = medicines.map((medicine, index) => `
                 <div class="medicine-item">
                     <div class="medicine-header">
@@ -281,7 +279,7 @@
                 </div>
             `).join('');
         }
-
+        
         // Show add form
         function showAddForm() {
             document.getElementById('formContainer').style.display = 'block';
@@ -291,13 +289,13 @@
             document.getElementById('f_priority').value = '999';
             document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         }
-
+        
         // Edit medicine
         function editMedicine(index, medicine) {
             document.getElementById('formContainer').style.display = 'block';
             document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
             document.getElementById('editIndex').value = index;
-
+            
             // Populate form fields
             const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
             fields.forEach(field => {
@@ -306,17 +304,17 @@
                     element.value = medicine[field] || '';
                 }
             });
-
+            
             document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         }
-
+        
         // Cancel edit
         function cancelEdit() {
             document.getElementById('formContainer').style.display = 'none';
             document.getElementById('medicineForm').reset();
             document.getElementById('editIndex').value = '-1';
         }
-
+        
         // Delete medicine
         async function deleteMedicine(index, name) {
             const apiKey = ensureApiKey(); // Ensure API key is available
@@ -325,9 +323,9 @@
                 return;
             }
             if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-
+            
             const disease = document.getElementById('diseaseSelect').value;
-
+            
             try {
                 const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
                     method: 'DELETE',
@@ -335,16 +333,16 @@
                         [API_KEY_NAME]: apiKey // Pass the API key
                     }
                 });
-
+                
                 if (!response.ok) throw new Error('Failed to delete medicine');
-
+                
                 showMessage(`Medicine "${name}" deleted successfully!`);
                 await refreshList();
             } catch (error) {
                 showMessage('Error deleting medicine: ' + error.message, 'error');
             }
         }
-
+        
         // Handle form submission
         document.getElementById('medicineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -412,16 +410,16 @@
                 showMessage("API Key is required to perform this action.", "error");
                 return;
             }
-
+            
             const disease = document.getElementById('diseaseSelect').value;
             if (!disease) {
                 showMessage('Please select a disease first!', 'error');
                 return;
             }
-
+            
             const index = parseInt(document.getElementById('editIndex').value);
             const isEdit = index >= 0;
-
+            
             // Collect form data
             const formData = {
                 name: document.getElementById('f_name').value,
@@ -438,11 +436,11 @@
                 availability: document.getElementById('f_availability').value || null,
                 note: document.getElementById('f_note').value || null
             };
-
+            
             try {
                 const url = isEdit ? `${API_BASE}/medicines/${disease}/${index}` : `${API_BASE}/medicines/${disease}`;
                 const method = isEdit ? 'PUT' : 'POST';
-
+                
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -451,12 +449,12 @@
                     },
                     body: JSON.stringify(formData)
                 });
-
+                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.detail || 'Failed to save medicine');
                 }
-
+                
                 showMessage(`Medicine "${formData.name}" ${isEdit ? 'updated' : 'added'} successfully!`);
                 cancelEdit();
                 await refreshList();
@@ -464,13 +462,12 @@
                 showMessage('Error saving medicine: ' + error.message, 'error');
             }
         });
-
+        
         // Auto-refresh when disease selection changes
         document.getElementById('diseaseSelect').addEventListener('change', refreshList);
-
+        
         // Initialize the page
         loadDiseases();
     </script>
 </body>
-
 </html>
