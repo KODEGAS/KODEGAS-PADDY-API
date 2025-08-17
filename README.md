@@ -1,6 +1,6 @@
-# KODEGAS Paddy API: AI-Powered Disease Detection for Rice Crops
+# WeGuard Paddy API: AI-Powered Disease Detection for Rice Crops
 
-This repository hosts the backend API for the KODEGAS Paddy disease detection system. Leveraging a trained TensorFlow model, this API provides robust capabilities for identifying diseases in paddy crops from images, alongside comprehensive management of disease information and recommended treatments. It's designed to be a reliable and scalable solution for agricultural insights.
+This repository hosts the backend API for the WeGuard Paddy disease detection system, developed by KODEGAS. Leveraging a trained TensorFlow model, this API provides robust capabilities for identifying diseases in paddy crops from images, alongside comprehensive management of disease information and recommended treatments. It's designed to be a reliable and scalable solution for agricultural insights.
 
 ## Key Features
 
@@ -146,7 +146,7 @@ The application includes a user-friendly web interface for managing the underlyi
 
 ## Contributing
 
-We welcome contributions to enhance the KODEGAS Paddy API! If you have suggestions, bug reports, or would like to contribute code, please feel free to open an issue or submit a pull request on our GitHub repository.
+We welcome contributions to enhance the WeGuard Paddy API! If you have suggestions, bug reports, or would like to contribute code, please feel free to open an issue or submit a pull request on our GitHub repository.
 
 ## License
 
