@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicines Manager</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -51,19 +52,19 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="f_name">Medicine Name *</label>
-                        <input type="text" id="f_name" required>
+                        <input type="text" id="f_name" placeholder="e.g., Thiamethoxam" required>
                     </div>
                     <div class="form-group">
                         <label for="f_brand">Brand</label>
-                        <input type="text" id="f_brand">
+                        <input type="text" id="f_brand" placeholder="e.g., Actara">
                     </div>
                     <div class="form-group">
                         <label for="f_type">Type *</label>
-                        <input type="text" id="f_type" required>
+                        <input type="text" id="f_type" placeholder="e.g., Insecticide" required>
                     </div>
                     <div class="form-group">
                         <label for="f_active_ingredient">Active Ingredient *</label>
-                        <input type="text" id="f_active_ingredient" required>
+                        <input type="text" id="f_active_ingredient" placeholder="e.g., Thiamethoxam 25% WG" required>
                     </div>
                 </div>
             </fieldset>
@@ -73,15 +74,15 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="f_pack_size">Pack Size</label>
-                        <input type="text" id="f_pack_size">
+                        <input type="text" id="f_pack_size" placeholder="e.g., 500g">
                     </div>
                     <div class="form-group">
                         <label for="f_price">Price *</label>
-                        <input type="number" id="f_price" required>
+                        <input type="text" id="f_price" placeholder="e.g., 800" required>
                     </div>
                     <div class="form-group">
                         <label for="f_availability">Availability</label>
-                        <input type="text" id="f_availability">
+                        <input type="text" id="f_availability" placeholder="e.g., Local agricultural stores">
                     </div>
                 </div>
             </fieldset>
@@ -91,15 +92,15 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="f_application_rate">Application Rate</label>
-                        <input type="text" id="f_application_rate">
+                        <input type="text" id="f_application_rate" placeholder="e.g., 2g per liter of water">
                     </div>
                     <div class="form-group">
                         <label for="f_method">Method</label>
-                        <input type="text" id="f_method">
+                        <input type="text" id="f_method" placeholder="e.g., Foliar spray">
                     </div>
                     <div class="form-group">
                         <label for="f_frequency">Frequency</label>
-                        <input type="text" id="f_frequency">
+                        <input type="text" id="f_frequency" placeholder="e.g., Every 14 days">
                     </div>
                 </div>
             </fieldset>
@@ -109,15 +110,15 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="f_priority">Priority</label>
-                        <input type="number" id="f_priority" value="999" min="0">
+                        <input type="number" id="f_priority" value="999" min="0" placeholder="e.g., 1">
                     </div>
                     <div class="form-group">
                         <label for="f_image_url">Image URL</label>
-                        <input type="url" id="f_image_url">
+                        <input type="url" id="f_image_url" placeholder="e.g., https://example.com/image.jpg">
                     </div>
                     <div class="form-group">
                         <label for="f_note">Notes</label>
-                        <textarea id="f_note"></textarea>
+                        <textarea id="f_note" placeholder="e.g., Wear protective gear during application."></textarea>
                     </div>
                 </div>
             </fieldset>
@@ -130,7 +131,13 @@
     </div>
 
     <script>
-        const API_BASE = 'http://kodegas-paddy-api.centralindia.cloudapp.azure.com';
+        const getApiBase = () => {
+            if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+                return ''; // Use relative path for local development
+            }
+            return 'https://kodegas-paddy-api.centralindia.cloudapp.azure.com'; // Production URL
+        };
+        const API_BASE = getApiBase();
         const API_KEY_NAME = "X-API-KEY";
         let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
@@ -168,12 +175,41 @@
             return apiKey;
         }
 
-        // Show messages to user
+        // Show messages to user as a modal popup
         function showMessage(message, type = 'success') {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            // Remove any existing modal
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Create modal elements
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+
+            const modalPopup = document.createElement('div');
+            modalPopup.className = `modal-popup ${type}`;
+
+            const messagePara = document.createElement('p');
+            messagePara.textContent = message;
+
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.onclick = () => modalOverlay.remove();
+
+            // Assemble modal
+            modalPopup.appendChild(messagePara);
+            modalPopup.appendChild(closeButton);
+            modalOverlay.appendChild(modalPopup);
+
+            // Add to body
+            document.body.appendChild(modalOverlay);
+
+            // Auto-close after 5 seconds
             setTimeout(() => {
-                messagesDiv.innerHTML = '';
+                if (document.body.contains(modalOverlay)) {
+                    modalOverlay.remove();
+                }
             }, 5000);
         }
 
@@ -346,16 +382,28 @@
                 const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
                     method: 'DELETE',
                     headers: {
-                        [API_KEY_NAME]: apiKey // Pass the API key
+                        [API_KEY_NAME]: apiKey
                     }
                 });
 
-                if (!response.ok) throw new Error('Failed to delete medicine');
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error("API Key is required to perform this action.");
+                    }
+                    let errorMsg = 'Failed to delete medicine';
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.detail || errorMsg;
+                    } catch (e) {
+                        // Ignore if response is not JSON
+                    }
+                    throw new Error(errorMsg);
+                }
 
                 showMessage(`Medicine "${name}" deleted successfully!`);
                 await refreshList();
             } catch (error) {
-                showMessage('Error deleting medicine: ' + error.message, 'error');
+                showMessage(`Error deleting medicine: ${error.message}`, 'error');
             }
         }
 
@@ -372,41 +420,36 @@
             const name = nameField.value.trim();
             const type = typeField.value.trim();
             const active_ingredient = activeIngredientField.value.trim();
-            const price = priceField.value.trim();
+            const priceStr = priceField.value.trim().replace(/[^0-9.]/g, ''); // Sanitize to only numbers and decimals
             const priority = priorityField.value.trim();
 
             let isValid = true;
+
+            // Reset all highlights
+            ['f_name', 'f_type', 'f_active_ingredient', 'f_price', 'f_priority'].forEach(id => highlightField(id, true));
 
             if (!name) {
                 showMessage('Medicine Name is a required field.', 'error');
                 highlightField('f_name', false);
                 isValid = false;
-            } else {
-                highlightField('f_name', true);
             }
 
             if (!type) {
                 showMessage('Type is a required field.', 'error');
                 highlightField('f_type', false);
                 isValid = false;
-            } else {
-                highlightField('f_type', true);
             }
 
             if (!active_ingredient) {
                 showMessage('Active Ingredient is a required field.', 'error');
                 highlightField('f_active_ingredient', false);
                 isValid = false;
-            } else {
-                highlightField('f_active_ingredient', true);
             }
 
-            if (price && isNaN(parseFloat(price))) {
-                showMessage('Price must be a valid number.', 'error');
+            if (!priceStr || isNaN(parseFloat(priceStr))) {
+                showMessage('Price is required and must be a valid number.', 'error');
                 highlightField('f_price', false);
                 isValid = false;
-            } else {
-                highlightField('f_price', true);
             }
 
             if (priority && isNaN(parseInt(priority))) {
@@ -443,7 +486,7 @@
                 type: document.getElementById('f_type').value || null,
                 active_ingredient: document.getElementById('f_active_ingredient').value || null,
                 pack_size: document.getElementById('f_pack_size').value || null,
-                price: document.getElementById('f_price').value || null,
+                price: priceStr ? parseFloat(priceStr).toString() : null,
                 priority: parseInt(document.getElementById('f_priority').value) || 999,
                 image_url: document.getElementById('f_image_url').value || null,
                 application_rate: document.getElementById('f_application_rate').value || null,
@@ -467,6 +510,9 @@
                 });
 
                 if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error("API Key is required to perform this action.");
+                    }
                     const errorData = await response.json();
                     throw new Error(errorData.detail || 'Failed to save medicine');
                 }
