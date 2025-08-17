@@ -211,6 +211,8 @@ async def predict(file: UploadFile = File(...)) -> Dict[str, Any]:
     
     contents = await file.read()
     try:
+        # Reset the file pointer to the beginning
+        await file.seek(0)
         image = Image.open(io.BytesIO(contents)).convert('RGB')
         image = image.resize((224, 224))
         image_array = np.array(image, dtype=np.float32) / 255.0
