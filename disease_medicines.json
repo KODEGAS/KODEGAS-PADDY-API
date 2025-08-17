@@ -197,13 +197,13 @@
             "type": "string",
             "active_ingredient": "string",
             "pack_size": "string",
-            "price": "string",
-            "image_url": "string",
+            "price": "200",
+            "image_url": "http://127.0.0.1:8000/static/medicine_info_crud.html",
             "application_rate": "string",
             "method": "string",
             "frequency": "string",
             "availability": "string",
-            "priority": 999,
+            "priority": 1,
             "note": "string"
         }
     ],

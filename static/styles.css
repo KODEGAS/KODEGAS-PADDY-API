@@ -271,3 +271,47 @@ legend {
     color: #333;
     flex-grow: 1;
 }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-popup {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-popup.success {
+    border-top: 5px solid #28a745;
+}
+
+.modal-popup.error {
+    border-top: 5px solid #dc3545;
+}
+
+.modal-popup p {
+    margin: 0 0 20px;
+    font-size: 1.1em;
+}
+
+.modal-popup button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

@@ -40,6 +40,11 @@ async def root():
     return '<div class="hub-container"><h1>KODEGAS</h1></div>'
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/favicon.ico")
+
+
 MODEL_PATH = "mymodel"
 LABELS_FILE = "labels.txt"
 DISEASE_INFO_FILE = "disease_info.json"
@@ -323,8 +328,11 @@ def create_medicine(
             detail=f"Medicine '{medicine.name}' already exists under '{key}'"
         )
     
-    # Add the new medicine
-    data[key].append(medicine.dict())
+    # Reorder priorities and add the new medicine
+    medicines = data.get(key, [])
+    _reorder_medicines(medicines, medicine.dict())
+    data[key] = sorted(medicines, key=lambda m: m.get("priority", 999))
+    
     _write_medicines_json(data)
     
     return {"disease": key, "created": medicine, "message": "Medicine added successfully"}
@@ -346,11 +354,45 @@ def update_medicine(
     if idx >= len(data[key]):
         raise HTTPException(status_code=404, detail=f"Medicine index {idx} not found in '{key}'")
     
-    # Update the medicine
-    data[key][idx] = medicine.dict()
+    # Reorder priorities and update the medicine
+    medicines = data.get(key, [])
+    _reorder_medicines(medicines, medicine.dict(), original_index=idx)
+    data[key] = sorted(medicines, key=lambda m: m.get("priority", 999))
+
     _write_medicines_json(data)
     
-    return {"disease": key, "index": idx, "updated": medicine, "message": "Medicine updated successfully"}
+    return {"disease": key, "updated": medicine, "message": "Medicine updated successfully"}
+
+
+def _reorder_medicines(medicines: List[Dict[str, Any]], new_medicine: Dict[str, Any], original_index: Optional[int] = None):
+    """
+    Reorders medicine priorities to ensure uniqueness and correct sorting.
+    - If a new medicine is added with a priority that already exists,
+      it shifts down the priorities of subsequent items.
+    - If a medicine's priority is updated, it adjusts the list accordingly.
+    """
+    new_priority = new_medicine.get("priority", 999)
+    
+    # If updating, remove the old version of the medicine first
+    if original_index is not None and 0 <= original_index < len(medicines):
+        medicines.pop(original_index)
+
+    # Check if the new priority already exists
+    is_priority_taken = any(m.get("priority") == new_priority for m in medicines)
+
+    if is_priority_taken:
+        # Shift priorities for items with the same or higher priority
+        for med in medicines:
+            if med.get("priority", 999) >= new_priority:
+                med["priority"] = med.get("priority", 999) + 1
+    
+    # Add the new or updated medicine to the list
+    medicines.append(new_medicine)
+    
+    # Normalize priorities to be sequential if there are gaps
+    medicines.sort(key=lambda m: m.get("priority", 999))
+    for i, med in enumerate(medicines):
+        med["priority"] = i + 1 # Re-assign priorities starting from 1
 
 
 @app.delete("/medicines/{disease}/{idx}", tags=["Medicines CRUD"])
@@ -371,6 +413,13 @@ def delete_medicine(
     # Remove the medicine
     removed_medicine = data[key].pop(idx)
     
+    # Re-order the remaining medicines to ensure sequential priorities
+    remaining_medicines = data[key]
+    remaining_medicines.sort(key=lambda m: m.get("priority", 999))
+    for i, med in enumerate(remaining_medicines):
+        med["priority"] = i + 1
+    data[key] = remaining_medicines
+
     # Optional: Remove empty disease categories (uncomment if desired)
     # if not data[key]:
     #     data.pop(key)
