@@ -29,6 +29,7 @@ origins = [
     "http://localhost:8002",
     "http://20.193.249.6",
     "http://kodegas-paddy-api.centralindia.cloudapp.azure.com",
+    "https://vguard-kyxy.onrender.com",
 ]
 
 app.add_middleware(
@@ -214,7 +215,8 @@ async def predict(file: UploadFile = File(...)) -> Dict[str, Any]:
         image = image.resize((224, 224))
         image_array = np.array(image, dtype=np.float32) / 255.0
         image_array = np.expand_dims(image_array, axis=0)
-        predictions = model.predict(image_array, verbose=0)[0]
+        output_dict = model(image_array)
+        predictions = next(iter(output_dict.values())).numpy()[0]
         top_class_idx = int(np.argmax(predictions))
         confidence = float(predictions[top_class_idx])
         predicted_class = class_names[top_class_idx]
