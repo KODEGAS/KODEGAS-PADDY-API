@@ -159,7 +159,53 @@
             "note": "Provides long-lasting protection. Compatible with integrated pest management (IPM)."
         }
     ],
-    "normal": [],
+    "normal": [
+        {
+            "name": "No Chemical Treatment Required",
+            "brand": "N/A",
+            "type": "Preventive Care",
+            "active_ingredient": "Good Agricultural Practices",
+            "pack_size": "N/A",
+            "price": "N/A",
+            "image_url": "https://i.ibb.co/example/healthy-rice.jpg",
+            "application_rate": "N/A",
+            "method": "Continue with proper agricultural practices",
+            "frequency": "Ongoing maintenance",
+            "availability": "N/A",
+            "priority": 1,
+            "note": "Healthy plants require no chemical treatment. Focus on maintaining optimal growing conditions, proper water management, balanced fertilization, and regular monitoring for early detection of any issues."
+        },
+        {
+            "name": "Balanced NPK Fertilizer",
+            "brand": "Various",
+            "type": "Fertilizer",
+            "active_ingredient": "Nitrogen, Phosphorus, Potassium",
+            "pack_size": "50kg",
+            "price": "Rs. 2500-3500",
+            "image_url": "https://i.ibb.co/example/npk-fertilizer.jpg",
+            "application_rate": "As per soil test recommendations",
+            "method": "Basal application and top dressing",
+            "frequency": "At planting and during growth stages",
+            "availability": "Widely available at all agro stores",
+            "priority": 2,
+            "note": "Maintain soil fertility to keep plants healthy and resistant to diseases. Regular soil testing helps determine exact nutrient requirements."
+        },
+        {
+            "name": "Organic Matter/Compost",
+            "brand": "Farm-made or Commercial",
+            "type": "Soil Amendment",
+            "active_ingredient": "Organic matter, beneficial microbes",
+            "pack_size": "Varies",
+            "price": "Rs. 500-1500 per ton",
+            "image_url": "https://i.ibb.co/example/organic-compost.jpg",
+            "application_rate": "5-10 tons per hectare",
+            "method": "Incorporate into soil before planting",
+            "frequency": "Before each cropping season",
+            "availability": "Available from local sources and commercial suppliers",
+            "priority": 3,
+            "note": "Improves soil structure, water retention, and provides slow-release nutrients. Essential for sustainable rice farming."
+        }
+    ],
     "hispa": [
         {
             "name": "Chlorpyrifos 20% EC",
