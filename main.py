@@ -24,13 +24,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Define allowed origins for CORS
 # In a production environment, this should be restricted to your frontend's domain
-origins = [
-    "http://localhost",
-    "http://localhost:8002",
-    "http://20.193.249.6",
-    "http://kodegas-paddy-api.centralindia.cloudapp.azure.com",
-    "https://vguard-kyxy.onrender.com",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
