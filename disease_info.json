@@ -115,14 +115,28 @@
     },
     "normal": {
         "disease_name": "Healthy Rice Plant",
-        "description": "No signs of disease, pests, or nutrient deficiency. Plant shows vigorous growth and green color.",
-        "symptoms": [],
-        "care": [
+        "caused_by": "Optimal growing conditions",
+        "description": "No signs of disease, pests, or nutrient deficiency. Plant shows vigorous growth and green color with proper development.",
+        "symptoms": [
+            "Vibrant green leaves with no discoloration",
+            "Normal plant height and tillering",
+            "Healthy root system",
+            "Proper panicle development and grain filling"
+        ],
+        "factors": [
+            "Balanced soil nutrients",
+            "Adequate water management",
+            "Good air circulation",
+            "Proper planting density"
+        ],
+        "prevention": [
             "Maintain proper water management",
             "Follow recommended fertilizer schedule",
-            "Monitor regularly for early signs of pests or disease"
+            "Monitor regularly for early signs of pests or disease",
+            "Use certified seeds and maintain field hygiene"
         ],
-        "note": "Well-managed fields with good agronomic practices typically show this condition."
+        "treatment": "No treatment needed. Continue with good agricultural practices to maintain plant health.",
+        "note": "Well-managed fields with good agronomic practices typically show this condition across all rice-growing regions of Sri Lanka."
     },
     "hispa": {
         "disease_name": "Hispa Beetle (Leaf Feeding Pest)",
