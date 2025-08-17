@@ -1,83 +1,35 @@
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-build/
-.venv
-.vscode
-
-develop-eggs/
-.vscode
-.venv
-__pycache__
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
-.env
+env/
 .venv/
 venv/
-ENV/
-env/
-.venv
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Logs and temporary files
 *.log
-logs/
-
-# Docker
-.dockerignore
-
-# Temporary files
 *.tmp
-*.temp
-temp/
-tmp/
+*.bak
+*.swp
+*~
 
-# Archives (keep source files, not zipped versions)
-*.zip
-*.tar.gz
-*.rar
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Data
+*.json
+test_image.jpg
+uv.lock

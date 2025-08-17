@@ -15,6 +15,7 @@ import threading
 import tempfile
 import os
 from typing import List, Dict, Any, Optional
+from image_processor import process_image_for_model, validate_and_process_image, ImageProcessor
 
 
 app = FastAPI()
@@ -24,7 +25,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Define allowed origins for CORS
 # In a production environment, this should be restricted to your frontend's domain
-origins = ["*"]
+# For example: origins = ["https://your-frontend-domain.com"]
+origins = ["*"]  # Keep "*" for development, but change for production
 
 app.add_middleware(
     CORSMiddleware,
@@ -204,31 +206,49 @@ def model_info() -> Dict[str, Any]:
 
 
 @app.post("/predict", tags=["Prediction"])
-async def predict(file: UploadFile = File(...)) -> Dict[str, Any]:
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
+async def predict(
+    file: UploadFile = File(...),
+    maintain_aspect_ratio: bool = Query(True, description="Maintain aspect ratio during resizing"),
+    max_size_mb: int = Query(50, description="Maximum file size in MB", ge=1, le=100)
+) -> Dict[str, Any]:
+    """
+    Predict rice disease from uploaded image.
     
-    contents = await file.read()
+    Supports large image uploads with automatic compression and resizing.
+    Images are processed to 224x224 pixels for model input.
+    """
     try:
-        # Reset the file pointer to the beginning
-        await file.seek(0)
-        image = Image.open(io.BytesIO(contents)).convert('RGB')
-        image = image.resize((224, 224))
-        image_array = np.array(image, dtype=np.float32) / 255.0
-        image_array = np.expand_dims(image_array, axis=0)
+        # Process the uploaded image
+        image_array, metadata = await validate_and_process_image(
+            file=file,
+            max_size_mb=max_size_mb,
+            target_size=(224, 224)
+        )
+        
+        # Make prediction
         output_dict = model(image_array)
         predictions = next(iter(output_dict.values())).numpy()[0]
         top_class_idx = int(np.argmax(predictions))
         confidence = float(predictions[top_class_idx])
         predicted_class = class_names[top_class_idx]
+        
         return {
             "predicted_class": predicted_class,
             "confidence": round(confidence, 4),
             "all_confidences": {
                 cls_name: round(float(conf), 4)
                 for cls_name, conf in zip(class_names, predictions)
+            },
+            "image_metadata": {
+                "original_size": metadata["original_size"],
+                "original_format": metadata["original_format"],
+                "file_name": metadata["file_name"],
+                "processing_info": "Image resized to 224x224 pixels for model input"
             }
         }
+    except HTTPException:
+        # Re-raise HTTP exceptions (like file size too large)
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
@@ -474,3 +494,85 @@ def update_disease_info_crud(
     _write_disease_info_json(data)
     
     return {"disease_key": key, "updated": info, "message": "Disease info updated successfully"}
+
+
+# Image Processing Endpoints
+
+@app.post("/process-image", tags=["Image Processing"])
+async def process_image_endpoint(
+    file: UploadFile = File(...),
+    target_size: str = Query("224x224", description="Target size in format 'widthxheight'"),
+    maintain_aspect_ratio: bool = Query(True, description="Maintain aspect ratio during resizing"),
+    quality: int = Query(85, description="JPEG quality (1-100)", ge=1, le=100),
+    output_format: str = Query("JPEG", description="Output format: JPEG, PNG, or WEBP")
+) -> Dict[str, Any]:
+    """
+    Process and compress an image without making predictions.
+    Useful for testing image processing capabilities.
+    """
+    try:
+        # Parse target size
+        try:
+            width, height = map(int, target_size.split('x'))
+            target_size_tuple = (width, height)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid target_size format. Use 'widthxheight' (e.g., '224x224')")
+        
+        # Process image
+        processor = ImageProcessor(target_size=target_size_tuple, quality=quality)
+        image_array, metadata = await processor.process_uploaded_image(
+            file, 
+            maintain_aspect_ratio=maintain_aspect_ratio
+        )
+        
+        # Get the processed image for compression
+        processed_image = Image.fromarray((image_array[0] * 255).astype(np.uint8))
+        
+        # Compress the image
+        compressed_data = processor.compress_image(processed_image, output_format, quality)
+        
+        # Calculate compression stats
+        original_size = metadata.get("file_size_bytes", 0)
+        compression_stats = processor.get_compression_stats(original_size, len(compressed_data))
+        
+        return {
+            "success": True,
+            "original_metadata": metadata,
+            "target_size": target_size_tuple,
+            "output_format": output_format,
+            "compression_stats": compression_stats,
+            "processed_image_size": image_array.shape,
+            "message": f"Image processed successfully to {target_size} pixels"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
+
+
+@app.get("/image-processing-info", tags=["Image Processing"])
+def get_image_processing_info() -> Dict[str, Any]:
+    """
+    Get information about image processing capabilities and limits.
+    """
+    return {
+        "supported_formats": ["JPEG", "PNG", "WEBP", "BMP", "TIFF"],
+        "default_target_size": (224, 224),
+        "max_file_size_mb": 50,
+        "default_quality": 85,
+        "features": [
+            "Large image upload support (up to 50MB)",
+            "Automatic compression and resizing",
+            "Aspect ratio preservation",
+            "Multiple output formats",
+            "Image enhancement for better model performance",
+            "Background padding for non-square images"
+        ],
+        "model_requirements": {
+            "input_size": "224x224 pixels",
+            "color_format": "RGB",
+            "normalization": "Pixel values normalized to [0, 1]",
+            "batch_dimension": "Single image with batch dimension"
+        }
+    }
