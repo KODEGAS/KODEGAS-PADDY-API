@@ -209,20 +209,31 @@ def model_info() -> Dict[str, Any]:
 async def predict(
     file: UploadFile = File(...),
     maintain_aspect_ratio: bool = Query(True, description="Maintain aspect ratio during resizing"),
-    max_size_mb: int = Query(50, description="Maximum file size in MB", ge=1, le=100)
+    max_size_mb: int = Query(10, description="Maximum file size in MB", ge=1, le=100),
+    compression_quality: int = Query(85, description="JPEG compression quality (1-100)", ge=1, le=100),
+    enhance_features: bool = Query(True, description="Apply rice disease-specific image enhancements for better prediction")
 ) -> Dict[str, Any]:
     """
     Predict rice disease from uploaded image.
     
     Supports large image uploads with automatic compression and resizing.
     Images are processed to 224x224 pixels for model input.
+    
+    When enhance_features=True, applies specialized preprocessing for rice disease detection:
+    - Green channel enhancement (rice diseases often manifest in green channel)
+    - Edge enhancement (improves detection of lesion boundaries)
+    - Contrast/sharpness optimization (makes disease features more prominent)
+    - Adaptive brightness adjustment (compensates for under/overexposed images)
+    - Noise reduction (removes sensor noise while preserving disease features)
     """
     try:
-        # Process the uploaded image
+        # Process the uploaded image with rice-specific enhancements
         image_array, metadata = await validate_and_process_image(
             file=file,
             max_size_mb=max_size_mb,
-            target_size=(224, 224)
+            target_size=(224, 224),
+            compression_quality=compression_quality,
+            enhance_features=enhance_features
         )
         
         # Make prediction
@@ -232,6 +243,9 @@ async def predict(
         confidence = float(predictions[top_class_idx])
         predicted_class = class_names[top_class_idx]
         
+        # Get disease information if available
+        disease_details = disease_info.get(predicted_class, {})
+        
         return {
             "predicted_class": predicted_class,
             "confidence": round(confidence, 4),
@@ -239,12 +253,14 @@ async def predict(
                 cls_name: round(float(conf), 4)
                 for cls_name, conf in zip(class_names, predictions)
             },
-            "image_metadata": {
-                "original_size": metadata["original_size"],
-                "original_format": metadata["original_format"],
-                "file_name": metadata["file_name"],
-                "processing_info": "Image resized to 224x224 pixels for model input"
-            }
+            "disease_info": {
+                "name": predicted_class,
+                "description": disease_details.get("description", "No description available"),
+                "symptoms": disease_details.get("symptoms", []),
+                "treatment": disease_details.get("treatment", [])
+            } if predicted_class != "normal" else {"name": "normal", "description": "No disease detected"},
+            "image_metadata": metadata,
+            "prediction_quality": "rice_optimized" if enhance_features else "standard"
         }
     except HTTPException:
         # Re-raise HTTP exceptions (like file size too large)

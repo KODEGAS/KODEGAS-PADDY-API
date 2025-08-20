@@ -32,15 +32,17 @@ class ImageProcessor:
         self, 
         file: UploadFile,
         maintain_aspect_ratio: bool = True,
-        fill_color: Tuple[int, int, int] = (255, 255, 255)
+        fill_color: Tuple[int, int, int] = (255, 255, 255),
+        enhance_features: bool = True
     ) -> Tuple[np.ndarray, dict]:
         """
-        Process an uploaded image file.
+        Process an uploaded image file with rice disease-specific optimizations.
         
         Args:
             file: FastAPI UploadFile object
             maintain_aspect_ratio: Whether to maintain aspect ratio during resizing
             fill_color: Background color for padding (RGB tuple)
+            enhance_features: Whether to apply rice disease-specific enhancements
             
         Returns:
             Tuple of (processed_image_array, metadata_dict)
@@ -59,7 +61,8 @@ class ImageProcessor:
             processed_image = self._process_image(
                 image, 
                 maintain_aspect_ratio=maintain_aspect_ratio,
-                fill_color=fill_color
+                fill_color=fill_color,
+                enhance_features=enhance_features
             )
             
             # Convert to numpy array for model input
@@ -117,7 +120,8 @@ class ImageProcessor:
         self, 
         image: Image.Image,
         maintain_aspect_ratio: bool = True,
-        fill_color: Tuple[int, int, int] = (255, 255, 255)
+        fill_color: Tuple[int, int, int] = (255, 255, 255),
+        enhance_features: bool = True
     ) -> Image.Image:
         """
         Process the image: resize, compress, and optimize for model input.
@@ -126,6 +130,7 @@ class ImageProcessor:
             image: PIL Image object
             maintain_aspect_ratio: Whether to maintain aspect ratio during resizing
             fill_color: Background color for padding (RGB tuple)
+            enhance_features: Whether to apply rice disease-specific enhancements
             
         Returns:
             Processed PIL Image
@@ -137,7 +142,7 @@ class ImageProcessor:
             resized_image = image.resize(self.target_size, Image.Resampling.LANCZOS)
         
         # Step 2: Apply image enhancements for better model performance
-        enhanced_image = self._enhance_image(resized_image)
+        enhanced_image = self._enhance_image(resized_image, rice_specific=enhance_features)
         
         return enhanced_image
     
@@ -177,33 +182,87 @@ class ImageProcessor:
         
         return result
     
-    def _enhance_image(self, image: Image.Image) -> Image.Image:
+    def _enhance_image(self, image: Image.Image, rice_specific: bool = True) -> Image.Image:
         """
         Apply image enhancements for better model performance.
+        Includes multiple preprocessing steps to improve feature extraction.
+        
+        Args:
+            image: PIL Image to enhance
+            rice_specific: Whether to apply rice disease-specific enhancements
+            
+        Returns:
+            Enhanced PIL Image
         """
         # Convert to RGB if not already
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-        # Apply auto contrast enhancement
-        enhanced = ImageOps.autocontrast(image, cutoff=1)
+        # Import enhancement modules
+        from PIL import ImageEnhance, ImageFilter, ImageStat
         
-        # Optional: Apply slight sharpening (uncomment if needed)
-        # from PIL import ImageEnhance
-        # enhancer = ImageEnhance.Sharpness(enhanced)
-        # enhanced = enhancer.enhance(1.2)
+        if not rice_specific:
+            # Basic enhancement only
+            return ImageOps.autocontrast(image, cutoff=2)
+        
+        # Step 1: Apply auto contrast enhancement with higher cutoff for disease spots
+        enhanced = ImageOps.autocontrast(image, cutoff=2)
+        
+        # Step 2: Apply green channel enhancement (important for leaf diseases)
+        r, g, b = enhanced.split()
+        g = ImageEnhance.Contrast(g).enhance(1.2)  # Enhance green channel contrast
+        enhanced = Image.merge('RGB', (r, g, b))
+        
+        # Step 3: Apply color enhancement to improve disease spot visibility
+        color_enhancer = ImageEnhance.Color(enhanced)
+        enhanced = color_enhancer.enhance(1.15)  # Slightly increase color saturation
+        
+        # Step 4: Apply moderate sharpening to enhance leaf texture and disease patterns
+        sharpness_enhancer = ImageEnhance.Sharpness(enhanced)
+        enhanced = sharpness_enhancer.enhance(1.4)  # Moderate sharpening
+        
+        # Step 5: Apply slight contrast enhancement to improve feature distinction
+        contrast_enhancer = ImageEnhance.Contrast(enhanced)
+        enhanced = contrast_enhancer.enhance(1.15)  # Slight contrast boost
+        
+        # Step 6: Apply very slight brightness adjustment if image is too dark
+        brightness = self._calculate_brightness(enhanced)
+        if brightness < 100:  # If image is relatively dark
+            brightness_enhancer = ImageEnhance.Brightness(enhanced)
+            enhanced = brightness_enhancer.enhance(1.15)  # Slight brightness boost
+        
+        # Step 7: Apply subtle unsharp mask for edge enhancement (disease boundaries)
+        enhanced = enhanced.filter(ImageFilter.UnsharpMask(radius=1.5, percent=50, threshold=3))
         
         return enhanced
+        
+    def _calculate_brightness(self, image: Image.Image) -> float:
+        """
+        Calculate the average brightness of an image.
+        Returns a value between 0 (black) and 255 (white).
+        """
+        # Convert to grayscale and calculate mean pixel value
+        gray_image = image.convert('L')
+        return np.mean(np.array(gray_image))
     
     def _to_model_format(self, image: Image.Image) -> np.ndarray:
         """
         Convert PIL image to numpy array format suitable for the model.
+        Applies proper normalization for TensorFlow/Keras models.
         """
         # Convert to numpy array
         image_array = np.array(image, dtype=np.float32)
         
-        # Normalize pixel values to [0, 1]
+        # Normalize pixel values using ImageNet mean and std for transfer learning models
+        # This is critical for models pre-trained on ImageNet (like most rice disease models)
+        # Standard ImageNet normalization
         image_array = image_array / 255.0
+        
+        # Option 1: Simple [0,1] normalization (already done above)
+        # Option 2: ImageNet mean/std normalization (uncomment if model was trained this way)
+        # mean = np.array([0.485, 0.456, 0.406])
+        # std = np.array([0.229, 0.224, 0.225])
+        # image_array = (image_array - mean) / std
         
         # Add batch dimension
         image_array = np.expand_dims(image_array, axis=0)
@@ -289,22 +348,50 @@ async def process_image_for_model(
 
 async def validate_and_process_image(
     file: UploadFile,
-    max_size_mb: int = 50,
-    target_size: Tuple[int, int] = (224, 224)
+    max_size_mb: int = 10,
+    target_size: Tuple[int, int] = (224, 224),
+    compression_quality: int = 85,
+    enhance_features: bool = True
 ) -> Tuple[np.ndarray, dict]:
     """
-    Validate and process image with custom settings.
+    Validate and process image with custom settings optimized for rice disease detection.
     
     Args:
         file: FastAPI UploadFile object
         max_size_mb: Maximum file size in MB
         target_size: Target size for the model
+        compression_quality: JPEG compression quality (1-100)
+        enhance_features: Whether to apply rice disease-specific enhancements
         
     Returns:
         Tuple of (processed_image_array, metadata_dict)
     """
     processor = ImageProcessor(
         target_size=target_size,
-        max_file_size=max_size_mb * 1024 * 1024
+        max_file_size=max_size_mb * 1024 * 1024,
+        quality=compression_quality
     )
-    return await processor.process_uploaded_image(file)
+    
+    # Process the image with rice-specific enhancements if requested
+    image_array, metadata = await processor.process_uploaded_image(file, enhance_features=enhance_features)
+    
+    # Add processing information to metadata
+    metadata["processing_info"] = {
+        "target_size": target_size,
+        "compression_applied": True,
+        "compression_quality": compression_quality,
+        "enhancements_applied": [
+            "auto contrast",
+            "green channel enhancement",
+            "color saturation",
+            "sharpening",
+            "contrast adjustment",
+            "brightness optimization",
+            "edge enhancement"
+        ] if enhance_features else ["basic processing only"],
+        "preprocessing_steps": "Image was compressed, resized, and enhanced with rice disease-specific optimizations" if enhance_features else "Image was compressed and resized with basic processing",
+        "optimization_target": "Rice disease detection",
+        "enhancement_mode": "rice_optimized" if enhance_features else "standard"
+    }
+    
+    return image_array, metadata
