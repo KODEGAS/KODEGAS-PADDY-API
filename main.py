@@ -26,7 +26,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Define allowed origins for CORS
 # In a production environment, this should be restricted to your frontend's domain
 # For example: origins = ["https://your-frontend-domain.com"]
-origins = ["*"]  # Keep "*" for development, but change for production
+# Configure allowed CORS origins via environment variable for production
+origins_env = os.environ.get("ALLOWED_ORIGINS")
+if origins_env:
+    origins = [o.strip() for o in origins_env.split(",") if o.strip()]
+else:
+    origins = ["*"]  # Keep "*" for development, but change for production
 
 app.add_middleware(
     CORSMiddleware,
