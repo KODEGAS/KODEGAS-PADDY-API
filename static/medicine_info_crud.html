@@ -141,6 +141,30 @@
 
         <script src="/static/js/api_base.js"></script>
         <script>
+            // Ensure API_BASE uses http for the Azure VM host regardless of page origin
+            try {
+                if (window.location.hostname === 'kodegas-paddy-api.centralindia.cloudapp.azure.com') {
+                    const port = window.location.port ? ':' + window.location.port : '';
+                    window.API_BASE = 'http://' + window.location.hostname + port;
+                    debugLog('API_BASE forced to ' + window.API_BASE);
+                    try {
+                        const dbg = document.getElementById('debugBox');
+                        if (dbg) {
+                            const info = document.createElement('div');
+                            info.style.fontSize = '12px';
+                            info.style.marginBottom = '4px';
+                            info.textContent = 'Forced API_BASE (override): ' + window.API_BASE;
+                            dbg.insertBefore(info, dbg.children[1] || null);
+                        }
+                    } catch (e) {
+                        console.warn('Failed to write forced API_BASE to debug box', e);
+                    }
+                }
+            } catch (e) {
+                console.warn('API_BASE override failed', e);
+            }
+        </script>
+        <script>
             // Debug box (visible on page) for environments where console is hard to access
             (function createDebugBox() {
                 try {
