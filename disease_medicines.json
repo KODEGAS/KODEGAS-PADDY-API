@@ -255,21 +255,6 @@
             "note": "Most effective when applied early. Protects young plants from vector transmission."
         },
         {
-            "name": "Imidacloprid 200g/l SL",
-            "brand": "Hayleys Admire",
-            "type": "Systemic Insecticide",
-            "active_ingredient": "Imidacloprid",
-            "pack_size": "50ml, 100ml, 200ml",
-            "price": null,
-            "image_url": "https://www.hayleysagriculture.com/wp-content/uploads/2021/01/Admire-200SL.png",
-            "application_rate": "5ml per 10L water",
-            "method": "Treat the nursery and continue spraying at 10-14 day intervals if symptoms appear.",
-            "frequency": "Repeat as needed",
-            "availability": "Widely available through Hayleys network",
-            "priority": 1,
-            "note": "Effective for Thrips and Brown plant hoppers, which can be vectors for viruses. [1]"
-        },
-        {
             "name": "Thiamethoxam 25% WG",
             "brand": "Syngenta Actara",
             "type": "Neonicotinoid Insecticide",
@@ -283,6 +268,21 @@
             "availability": "Available in urban and semi-urban agro stores",
             "priority": 2,
             "note": "Excellent for vector control. Avoid overuse to protect beneficial insects."
+        },
+        {
+            "name": "Imidacloprid 200g/l SL",
+            "brand": "Hayleys Admire",
+            "type": "Systemic Insecticide",
+            "active_ingredient": "Imidacloprid",
+            "pack_size": "50ml, 100ml, 200ml",
+            "price": "960",
+            "image_url": "https://www.hayleysagriculture.com/wp-content/uploads/2021/01/Admire-200SL.png",
+            "application_rate": "5ml per 10L water",
+            "method": "Treat the nursery and continue spraying at 10-14 day intervals if symptoms appear.",
+            "frequency": "Repeat as needed",
+            "availability": "Widely available through Hayleys network",
+            "priority": 3,
+            "note": "Effective for Thrips and Brown plant hoppers, which can be vectors for viruses. [1]"
         }
     ],
     "blast": [
