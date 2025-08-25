@@ -152,7 +152,16 @@ def _write_disease_info_json(data: dict):
 
 
 try:
-    model = tf.keras.layers.TFSMLayer(MODEL_PATH, call_endpoint='serving_default')
+    import os
+
+    # Allow skipping heavy model load during tests or CI environments
+    if os.environ.get('SKIP_MODEL_LOAD') not in ('1', 'true', 'True'):
+        try:
+            model = tf.keras.layers.TFSMLayer(MODEL_PATH, call_endpoint='serving_default')
+        except Exception as e:
+            raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
+    else:
+        model = None
 except Exception as e:
     raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
 

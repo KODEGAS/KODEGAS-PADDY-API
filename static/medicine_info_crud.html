@@ -130,15 +130,10 @@
         </form>
     </div>
 
+    <script src="/static/js/api_base.js"></script>
     <script>
-        const getApiBase = () => {
-            if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
-                return ''; // Use relative path for local development
-            }
-            return 'https://kodegas-paddy-api.centralindia.cloudapp.azure.com'; // Production URL
-        };
-        const API_BASE = getApiBase();
         const API_KEY_NAME = "X-API-KEY";
+        const API_BASE = window.API_BASE;
         let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
         // Load API key from session storage on page load

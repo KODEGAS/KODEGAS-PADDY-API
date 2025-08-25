@@ -103,7 +103,10 @@
     </div>
 
     <script>
-        const API_BASE = 'http://kodegas-paddy-api.centralindia.cloudapp.azure.com';
+    </script>
+    <script src="/static/js/api_base.js"></script>
+    <script>
+        const API_BASE = window.API_BASE;
         const API_KEY_NAME = "X-API-KEY";
         let apiKey = sessionStorage.getItem(API_KEY_NAME);
 

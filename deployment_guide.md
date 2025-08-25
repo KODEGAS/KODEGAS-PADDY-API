@@ -166,7 +166,6 @@ When you want to update an HTML file or any other part of your application, foll
 
 Your updated application will now be live.
 
----
 
 ### Step 7: Automating Deployments with GitHub Actions
 
@@ -183,7 +182,6 @@ You can automate the update process using GitHub Actions. This will automaticall
 
 Now, every time you push a change to your `main` branch, the GitHub Actions workflow will automatically connect to your VM, pull the latest code, and redeploy your application.
 
----
 
 ### Step 8: Setting Up SSL with Certbot (Free HTTPS)
 
@@ -222,3 +220,95 @@ Securing your application with HTTPS is crucial for production. We'll use Certbo
     ```
 
 Your application should now be accessible via `https://kodegas-paddy-api.centralindia.cloudapp.azure.com`, and all traffic will be securely encrypted.
+
+## Troubleshooting: Static UI functions not working after deployment
+
+Symptom:
+
+
+Root cause:
+
+
+Fix applied:
+
+
+```js
+const getApiBase = () => {
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') return '';
+    if (window.location.origin) return window.location.origin;
+    return 'https://kodegas-paddy-api.centralindia.cloudapp.azure.com'; // fallback
+};
+const API_BASE = getApiBase();
+```
+
+
+Recommendation:
+
+
+## Production-readiness checklist (additional recommendations)
+
+- Serve the UI and API under the same origin using Nginx as a reverse proxy. Example location block that proxies API requests to the app running on localhost:8000:
+
+```nginx
+location / {
+    try_files $uri $uri/ @app;
+}
+
+location @app {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+- If you keep UI and API on different hosts, update the `API_BASE` fallback in `static/js/api_base.js` to the correct scheme (HTTP in your case) and ensure CORS is configured on the API to allow the UI origin.
+- Run your Gunicorn container as a non-root user (Dockerfile already creates `app` user). Ensure container runs with minimal privileges in production and consider adding resource limits.
+- Configure a process supervisor or systemd unit if you don't use Docker for automatic restarts and health-check-driven restarts.
+- Add log rotation for Gunicorn logs and centralize logs (e.g., to Azure Monitor) for production observability.
+
+### Running the container in production
+
+If you use Docker in production, run the container with limited privileges and resource caps. Example:
+
+```bash
+sudo docker run -d \
+    --name paddy-api-container \
+    --restart unless-stopped \
+    --user 1000:1000 \
+    -p 127.0.0.1:8000:8000 \
+    --memory=1g --cpus=1 \
+    paddy-api-image
+```
+
+### Optional: systemd unit (if not using Docker)
+
+Create `/etc/systemd/system/paddy-api.service` with content:
+
+```ini
+[Unit]
+Description=Paddy API
+After=network.target
+
+[Service]
+User=app
+Group=app
+WorkingDirectory=/path/to/paddy_disease_api
+Environment=SKIP_MODEL_LOAD=0
+ExecStart=/usr/bin/gunicorn -c /path/to/paddy_disease_api/gunicorn_conf.py main:app
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable and start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable paddy-api
+sudo systemctl start paddy-api
+```
+
+
