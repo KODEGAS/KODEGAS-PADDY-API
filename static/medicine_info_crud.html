@@ -10,320 +10,329 @@
 </head>
 
 <body>
-    <header>
-        <h1>🌾 Medicines Manager</h1>
-        <nav>
-            <a href="/static/api_data.html">Data Hub</a>
-            <a href="/static/disease_info_crud.html">Manage Disease Info</a>
-        </nav>
-    </header>
-
-    <div class="container">
-        <h2>Control Panel</h2>
-        <div class="controls">
-            <label for="diseaseSelect">Select Disease:</label>
-            <select id="diseaseSelect">
-                <option value="">Loading...</option>
-            </select>
-            <button onclick="refreshList()">🔄 Refresh</button>
-            <button onclick="showAddForm()">➕ Add New Medicine</button>
-        </div>
-        <div class="controls" style="margin-top: 15px;">
-            <label for="apiKeyInput">API Key:</label>
-            <input type="password" id="apiKeyInput" placeholder="Enter API Key">
-            <button onclick="saveApiKey()">💾 Save API Key</button>
-        </div>
-
-        <div id="messages"></div>
-    </div>
-
-    <div class="container">
-        <h2>📋 Existing Medicines</h2>
-        <div id="medicinesList" class="loading">Loading medicines...</div>
-    </div>
-
-    <div class="container" id="formContainer" style="display: none;">
-        <h2 id="formTitle">➕ Add New Medicine</h2>
-        <form id="medicineForm">
-            <input type="hidden" id="editIndex" value="-1">
-
-            <fieldset>
-                <legend>Basic Information</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="f_name">Medicine Name *</label>
-                        <input type="text" id="f_name" placeholder="e.g., Thiamethoxam" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="f_brand">Brand</label>
-                        <input type="text" id="f_brand" placeholder="e.g., Actara">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_type">Type *</label>
-                        <input type="text" id="f_type" placeholder="e.g., Insecticide" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="f_active_ingredient">Active Ingredient *</label>
-                        <input type="text" id="f_active_ingredient" placeholder="e.g., Thiamethoxam 25% WG" required>
-                    </div>
+    <div class="page-wrap">
+        <header>
+            <div class="brand">
+                <div style="font-size:28px;">🌾</div>
+                <div>
+                    <h1>Medicines Manager</h1>
+                    <p>Admin — manage medicines linked to diseases</p>
                 </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Purchase Details</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="f_pack_size">Pack Size</label>
-                        <input type="text" id="f_pack_size" placeholder="e.g., 500g">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_price">Price *</label>
-                        <input type="text" id="f_price" placeholder="e.g., 800" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="f_availability">Availability</label>
-                        <input type="text" id="f_availability" placeholder="e.g., Local agricultural stores">
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Application</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="f_application_rate">Application Rate</label>
-                        <input type="text" id="f_application_rate" placeholder="e.g., 2g per liter of water">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_method">Method</label>
-                        <input type="text" id="f_method" placeholder="e.g., Foliar spray">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_frequency">Frequency</label>
-                        <input type="text" id="f_frequency" placeholder="e.g., Every 14 days">
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Metadata</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="f_priority">Priority</label>
-                        <input type="number" id="f_priority" value="999" min="0" placeholder="e.g., 1">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_image_url">Image URL</label>
-                        <input type="url" id="f_image_url" placeholder="e.g., https://example.com/image.jpg">
-                    </div>
-                    <div class="form-group">
-                        <label for="f_note">Notes</label>
-                        <textarea id="f_note" placeholder="e.g., Wear protective gear during application."></textarea>
-                    </div>
-                </div>
-            </fieldset>
-
-            <div style="margin-top: 20px;">
-                <button type="submit">💾 Save Medicine</button>
-                <button type="button" onclick="cancelEdit()">❌ Cancel</button>
             </div>
-        </form>
-    </div>
+            <nav>
+                <a href="/static/api_data.html">Data Hub</a>
+                <a class="secondary" href="/static/disease_info_crud.html">Manage Disease Info</a>
+            </nav>
+        </header>
 
-    <script src="/static/js/api_base.js"></script>
-    <script>
-        // Debug box (visible on page) for environments where console is hard to access
-        (function createDebugBox(){
-            try {
-                const dbg = document.createElement('div');
-                dbg.id = 'debugBox';
-                dbg.style.cssText = 'position:fixed;right:10px;bottom:10px;max-width:380px;max-height:300px;overflow:auto;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:8px;font-size:12px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
-                const title = document.createElement('div');
-                title.textContent = 'DEBUG';
-                title.style.fontWeight = '700';
-                title.style.marginBottom = '6px';
-                dbg.appendChild(title);
-                document.body.appendChild(dbg);
-            } catch (e) {
-                console.warn('Could not create debug box', e);
-            }
-        })();
+        <div class="container">
+            <h2>Control Panel</h2>
+            <div class="controls">
+                <label for="diseaseSelect">Select Disease:</label>
+                <select id="diseaseSelect">
+                    <option value="">Loading...</option>
+                </select>
+                <button onclick="refreshList()">🔄 Refresh</button>
+                <button onclick="showAddForm()" class="edit">➕ Add New</button>
+            </div>
+            <div class="controls" style="margin-top: 15px;">
+                <label for="apiKeyInput">API Key:</label>
+                <input type="password" id="apiKeyInput" placeholder="Enter API Key">
+                <button onclick="saveApiKey()">💾 Save</button>
+            </div>
 
-        function debugLog(msg){
-            try{ console.log(msg); const d=document.getElementById('debugBox'); if(d){ const p=document.createElement('div'); p.textContent = msg; d.appendChild(p); } }catch(e){}
-        }
-        function debugError(msg){
-            try{ console.error(msg); const d=document.getElementById('debugBox'); if(d){ const p=document.createElement('div'); p.textContent = 'ERROR: '+msg; p.style.color='red'; d.appendChild(p); } }catch(e){}
-        }
+            <div id="messages"></div>
+        </div>
 
-        try {
-            const API_KEY_NAME = "X-API-KEY";
-            const API_BASE = window.API_BASE;
-            let apiKey = sessionStorage.getItem(API_KEY_NAME);
+        <div class="container">
+            <h2>📋 Existing Medicines</h2>
+            <div id="medicinesList" class="loading">Loading medicines...</div>
+        </div>
 
-            debugLog('API_BASE=' + API_BASE);
+        <div class="container" id="formContainer" style="display: none;">
+            <h2 id="formTitle">➕ Add New Medicine</h2>
+            <form id="medicineForm">
+                <input type="hidden" id="editIndex" value="-1">
 
-            // Load API key from session storage on page load
-            document.addEventListener('DOMContentLoaded', () => {
+                <fieldset>
+                    <legend>Basic Information</legend>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_name">Medicine Name *</label>
+                            <input type="text" id="f_name" placeholder="e.g., Thiamethoxam" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="f_brand">Brand</label>
+                            <input type="text" id="f_brand" placeholder="e.g., Actara">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_type">Type *</label>
+                            <input type="text" id="f_type" placeholder="e.g., Insecticide" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="f_active_ingredient">Active Ingredient *</label>
+                            <input type="text" id="f_active_ingredient" placeholder="e.g., Thiamethoxam 25% WG"
+                                required>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Purchase Details</legend>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_pack_size">Pack Size</label>
+                            <input type="text" id="f_pack_size" placeholder="e.g., 500g">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_price">Price *</label>
+                            <input type="text" id="f_price" placeholder="e.g., 800" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="f_availability">Availability</label>
+                            <input type="text" id="f_availability" placeholder="e.g., Local agricultural stores">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Application</legend>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_application_rate">Application Rate</label>
+                            <input type="text" id="f_application_rate" placeholder="e.g., 2g per liter of water">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_method">Method</label>
+                            <input type="text" id="f_method" placeholder="e.g., Foliar spray">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_frequency">Frequency</label>
+                            <input type="text" id="f_frequency" placeholder="e.g., Every 14 days">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Metadata</legend>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_priority">Priority</label>
+                            <input type="number" id="f_priority" value="999" min="0" placeholder="e.g., 1">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_image_url">Image URL</label>
+                            <input type="url" id="f_image_url" placeholder="e.g., https://example.com/image.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_note">Notes</label>
+                            <textarea id="f_note"
+                                placeholder="e.g., Wear protective gear during application."></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div style="margin-top: 20px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="submit">💾 Save Medicine</button>
+                    <button type="button" onclick="cancelEdit()" class="danger">❌ Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <script src="/static/js/api_base.js"></script>
+        <script>
+            // Debug box (visible on page) for environments where console is hard to access
+            (function createDebugBox() {
                 try {
-                    const storedKey = sessionStorage.getItem(API_KEY_NAME);
-                    if (storedKey) {
-                        const el = document.getElementById('apiKeyInput');
-                        if (el) el.value = storedKey;
-                        apiKey = storedKey;
-                        debugLog('Loaded API key from sessionStorage');
-                    }
+                    const dbg = document.createElement('div');
+                    dbg.id = 'debugBox';
+                    dbg.style.cssText = 'position:fixed;right:10px;bottom:10px;max-width:380px;max-height:300px;overflow:auto;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:8px;font-size:12px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
+                    const title = document.createElement('div');
+                    title.textContent = 'DEBUG';
+                    title.style.fontWeight = '700';
+                    title.style.marginBottom = '6px';
+                    dbg.appendChild(title);
+                    document.body.appendChild(dbg);
                 } catch (e) {
-                    debugError('DOMContentLoaded handler error: ' + e.message);
+                    console.warn('Could not create debug box', e);
                 }
-            });
+            })();
 
-        function saveApiKey() {
-            const inputKey = document.getElementById('apiKeyInput').value;
-            if (inputKey) {
-                sessionStorage.setItem(API_KEY_NAME, inputKey);
-                apiKey = inputKey;
-                showMessage("API Key saved!", "success");
-            } else {
-                showMessage("Please enter an API Key to save.", "error");
+            function debugLog(msg) {
+                try { console.log(msg); const d = document.getElementById('debugBox'); if (d) { const p = document.createElement('div'); p.textContent = msg; d.appendChild(p); } } catch (e) { }
             }
-        }
-
-        function ensureApiKey() {
-            if (!apiKey) {
-                const inputKey = document.getElementById('apiKeyInput').value;
-                if (inputKey) {
-                    sessionStorage.setItem(API_KEY_NAME, inputKey);
-                    apiKey = inputKey;
-                } else {
-                    showMessage("Please enter your API Key in the input field.", "error");
-                    return null;
-                }
-            }
-            return apiKey;
-        }
-
-        // Show messages to user as a modal popup
-        function showMessage(message, type = 'success') {
-            // Remove any existing modal
-            const existingModal = document.querySelector('.modal-overlay');
-            if (existingModal) {
-                existingModal.remove();
+            function debugError(msg) {
+                try { console.error(msg); const d = document.getElementById('debugBox'); if (d) { const p = document.createElement('div'); p.textContent = 'ERROR: ' + msg; p.style.color = 'red'; d.appendChild(p); } } catch (e) { }
             }
 
-            // Create modal elements
-            const modalOverlay = document.createElement('div');
-            modalOverlay.className = 'modal-overlay';
-
-            const modalPopup = document.createElement('div');
-            modalPopup.className = `modal-popup ${type}`;
-
-            const messagePara = document.createElement('p');
-            messagePara.textContent = message;
-
-            const closeButton = document.createElement('button');
-            closeButton.textContent = 'Close';
-            closeButton.onclick = () => modalOverlay.remove();
-
-            // Assemble modal
-            modalPopup.appendChild(messagePara);
-            modalPopup.appendChild(closeButton);
-            modalOverlay.appendChild(modalPopup);
-
-            // Add to body
-            document.body.appendChild(modalOverlay);
-
-            // Auto-close after 5 seconds
-            setTimeout(() => {
-                if (document.body.contains(modalOverlay)) {
-                    modalOverlay.remove();
-                }
-            }, 5000);
-        }
-
-        // Highlight invalid fields
-        function highlightField(fieldId, isValid) {
-            const field = document.getElementById(fieldId);
-            if (isValid) {
-                field.classList.remove('invalid');
-            } else {
-                field.classList.add('invalid');
-            }
-        }
-
-        // Load available diseases
-        async function loadDiseases() {
             try {
-                console.log('loadDiseases: trying', API_BASE + '/medicines');
-                let response;
-                try {
-                    response = await fetch(`${API_BASE}/medicines`);
-                    if (!response.ok) throw new Error('Failed to load diseases from API_BASE');
-                } catch (err) {
-                    console.warn('API_BASE fetch failed, trying relative /medicines', err);
-                    // fallback to relative path (same-origin)
-                    response = await fetch(`/medicines`);
-                    if (!response.ok) throw new Error('Failed to load diseases from relative path');
-                }
+                const API_KEY_NAME = "X-API-KEY";
+                const API_BASE = window.API_BASE;
+                let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
-                const data = await response.json();
-                const select = document.getElementById('diseaseSelect');
-                select.innerHTML = '<option value="">Select a disease...</option>';
+                debugLog('API_BASE=' + API_BASE);
 
-                data.available_diseases.forEach(disease => {
-                    const option = document.createElement('option');
-                    option.value = disease;
-                    option.textContent = disease.replace(/_/g, ' ').toUpperCase();
-                    select.appendChild(option);
+                // Load API key from session storage on page load
+                document.addEventListener('DOMContentLoaded', () => {
+                    try {
+                        const storedKey = sessionStorage.getItem(API_KEY_NAME);
+                        if (storedKey) {
+                            const el = document.getElementById('apiKeyInput');
+                            if (el) el.value = storedKey;
+                            apiKey = storedKey;
+                            debugLog('Loaded API key from sessionStorage');
+                        }
+                    } catch (e) {
+                        debugError('DOMContentLoaded handler error: ' + e.message);
+                    }
                 });
 
-                // Auto-select first disease if available
-                if (data.available_diseases.length > 0) {
-                    select.value = data.available_diseases[0];
-                    await refreshList();
+                function saveApiKey() {
+                    const inputKey = document.getElementById('apiKeyInput').value;
+                    if (inputKey) {
+                        sessionStorage.setItem(API_KEY_NAME, inputKey);
+                        apiKey = inputKey;
+                        showMessage("API Key saved!", "success");
+                    } else {
+                        showMessage("Please enter an API Key to save.", "error");
+                    }
                 }
-            } catch (error) {
-                showMessage('Error loading diseases: ' + error.message, 'error');
-            }
-        }
 
-        // Refresh medicines list
-        async function refreshList() {
-            const disease = document.getElementById('diseaseSelect').value;
-            if (!disease) {
-                document.getElementById('medicinesList').innerHTML = '<p>Please select a disease first.</p>';
-                return;
-            }
+                function ensureApiKey() {
+                    if (!apiKey) {
+                        const inputKey = document.getElementById('apiKeyInput').value;
+                        if (inputKey) {
+                            sessionStorage.setItem(API_KEY_NAME, inputKey);
+                            apiKey = inputKey;
+                        } else {
+                            showMessage("Please enter your API Key in the input field.", "error");
+                            return null;
+                        }
+                    }
+                    return apiKey;
+                }
 
-            document.getElementById('medicinesList').innerHTML = '<div class="loading">Loading medicines...</div>';
+                // Show messages to user as a modal popup
+                function showMessage(message, type = 'success') {
+                    // Remove any existing modal
+                    const existingModal = document.querySelector('.modal-overlay');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
 
-            try {
-                const response = await fetch(`${API_BASE}/medicines/${disease}`);
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        document.getElementById('medicinesList').innerHTML = '<p>No medicines found for this disease.</p>';
+                    // Create modal elements
+                    const modalOverlay = document.createElement('div');
+                    modalOverlay.className = 'modal-overlay';
+
+                    const modalPopup = document.createElement('div');
+                    modalPopup.className = `modal-popup ${type}`;
+
+                    const messagePara = document.createElement('p');
+                    messagePara.textContent = message;
+
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = 'Close';
+                    closeButton.onclick = () => modalOverlay.remove();
+
+                    // Assemble modal
+                    modalPopup.appendChild(messagePara);
+                    modalPopup.appendChild(closeButton);
+                    modalOverlay.appendChild(modalPopup);
+
+                    // Add to body
+                    document.body.appendChild(modalOverlay);
+
+                    // Auto-close after 5 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(modalOverlay)) {
+                            modalOverlay.remove();
+                        }
+                    }, 5000);
+                }
+
+                // Highlight invalid fields
+                function highlightField(fieldId, isValid) {
+                    const field = document.getElementById(fieldId);
+                    if (isValid) {
+                        field.classList.remove('invalid');
+                    } else {
+                        field.classList.add('invalid');
+                    }
+                }
+
+                // Load available diseases
+                async function loadDiseases() {
+                    try {
+                        console.log('loadDiseases: trying', API_BASE + '/medicines');
+                        let response;
+                        try {
+                            response = await fetch(`${API_BASE}/medicines`);
+                            if (!response.ok) throw new Error('Failed to load diseases from API_BASE');
+                        } catch (err) {
+                            console.warn('API_BASE fetch failed, trying relative /medicines', err);
+                            // fallback to relative path (same-origin)
+                            response = await fetch(`/medicines`);
+                            if (!response.ok) throw new Error('Failed to load diseases from relative path');
+                        }
+
+                        const data = await response.json();
+                        const select = document.getElementById('diseaseSelect');
+                        select.innerHTML = '<option value="">Select a disease...</option>';
+
+                        data.available_diseases.forEach(disease => {
+                            const option = document.createElement('option');
+                            option.value = disease;
+                            option.textContent = disease.replace(/_/g, ' ').toUpperCase();
+                            select.appendChild(option);
+                        });
+
+                        // Auto-select first disease if available
+                        if (data.available_diseases.length > 0) {
+                            select.value = data.available_diseases[0];
+                            await refreshList();
+                        }
+                    } catch (error) {
+                        showMessage('Error loading diseases: ' + error.message, 'error');
+                    }
+                }
+
+                // Refresh medicines list
+                async function refreshList() {
+                    const disease = document.getElementById('diseaseSelect').value;
+                    if (!disease) {
+                        document.getElementById('medicinesList').innerHTML = '<p>Please select a disease first.</p>';
                         return;
                     }
-                    throw new Error('Failed to load medicines');
+
+                    document.getElementById('medicinesList').innerHTML = '<div class="loading">Loading medicines...</div>';
+
+                    try {
+                        const response = await fetch(`${API_BASE}/medicines/${disease}`);
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                document.getElementById('medicinesList').innerHTML = '<p>No medicines found for this disease.</p>';
+                                return;
+                            }
+                            throw new Error('Failed to load medicines');
+                        }
+
+                        const data = await response.json();
+                        displayMedicines(data.medicines);
+                    } catch (error) {
+                        document.getElementById('medicinesList').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                    }
                 }
 
-                const data = await response.json();
-                displayMedicines(data.medicines);
-            } catch (error) {
-                document.getElementById('medicinesList').innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
-        }
+                // Display medicines in the UI
+                function displayMedicines(medicines) {
+                    const container = document.getElementById('medicinesList');
 
-        // Display medicines in the UI
-        function displayMedicines(medicines) {
-            const container = document.getElementById('medicinesList');
+                    if (medicines.length === 0) {
+                        container.innerHTML = '<p>No medicines found for this disease.</p>';
+                        return;
+                    }
 
-            if (medicines.length === 0) {
-                container.innerHTML = '<p>No medicines found for this disease.</p>';
-                return;
-            }
-
-            container.innerHTML = medicines.map((medicine, index) => `
+                    container.innerHTML = medicines.map((medicine, index) => `
                 <div class="medicine-item">
                     <div class="medicine-header">
                         <div class="medicine-title">
@@ -366,218 +375,219 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        // Show add form
-        function showAddForm() {
-            document.getElementById('formContainer').style.display = 'block';
-            document.getElementById('formTitle').textContent = '➕ Add New Medicine';
-            document.getElementById('editIndex').value = '-1';
-            document.getElementById('medicineForm').reset();
-            document.getElementById('f_priority').value = '999';
-            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Edit medicine
-        function editMedicine(index, medicineString) {
-            const medicine = JSON.parse(decodeURIComponent(medicineString)); // Decode and parse the stringified JSON
-            document.getElementById('formContainer').style.display = 'block';
-            document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
-            document.getElementById('editIndex').value = index;
-
-            // Populate form fields
-            const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
-            fields.forEach(field => {
-                const element = document.getElementById('f_' + field);
-                if (element) {
-                    element.value = medicine[field] || '';
                 }
-            });
 
-            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
-        }
+                // Show add form
+                function showAddForm() {
+                    document.getElementById('formContainer').style.display = 'block';
+                    document.getElementById('formTitle').textContent = '➕ Add New Medicine';
+                    document.getElementById('editIndex').value = '-1';
+                    document.getElementById('medicineForm').reset();
+                    document.getElementById('f_priority').value = '999';
+                    document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+                }
 
-        // Cancel edit
-        function cancelEdit() {
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('medicineForm').reset();
-            document.getElementById('editIndex').value = '-1';
-        }
+                // Edit medicine
+                function editMedicine(index, medicineString) {
+                    const medicine = JSON.parse(decodeURIComponent(medicineString)); // Decode and parse the stringified JSON
+                    document.getElementById('formContainer').style.display = 'block';
+                    document.getElementById('formTitle').textContent = '✏️ Edit Medicine';
+                    document.getElementById('editIndex').value = index;
 
-        // Delete medicine
-        async function deleteMedicine(index, name) {
-            const apiKey = ensureApiKey(); // Ensure API key is available
-            if (!apiKey) {
-                showMessage("API Key is required to perform this action.", "error");
-                return;
-            }
-            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+                    // Populate form fields
+                    const fields = ['name', 'brand', 'type', 'active_ingredient', 'pack_size', 'price', 'priority', 'image_url', 'application_rate', 'method', 'frequency', 'availability', 'note'];
+                    fields.forEach(field => {
+                        const element = document.getElementById('f_' + field);
+                        if (element) {
+                            element.value = medicine[field] || '';
+                        }
+                    });
 
-            const disease = document.getElementById('diseaseSelect').value;
+                    document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+                }
 
-            try {
-                const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
-                    method: 'DELETE',
-                    headers: {
-                        [API_KEY_NAME]: apiKey
+                // Cancel edit
+                function cancelEdit() {
+                    document.getElementById('formContainer').style.display = 'none';
+                    document.getElementById('medicineForm').reset();
+                    document.getElementById('editIndex').value = '-1';
+                }
+
+                // Delete medicine
+                async function deleteMedicine(index, name) {
+                    const apiKey = ensureApiKey(); // Ensure API key is available
+                    if (!apiKey) {
+                        showMessage("API Key is required to perform this action.", "error");
+                        return;
                     }
-                });
+                    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
 
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error("API Key is required to perform this action.");
-                    }
-                    let errorMsg = 'Failed to delete medicine';
+                    const disease = document.getElementById('diseaseSelect').value;
+
                     try {
-                        const errorData = await response.json();
-                        errorMsg = errorData.detail || errorMsg;
-                    } catch (e) {
-                        // Ignore if response is not JSON
+                        const response = await fetch(`${API_BASE}/medicines/${disease}/${index}`, {
+                            method: 'DELETE',
+                            headers: {
+                                [API_KEY_NAME]: apiKey
+                            }
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 403) {
+                                throw new Error("API Key is required to perform this action.");
+                            }
+                            let errorMsg = 'Failed to delete medicine';
+                            try {
+                                const errorData = await response.json();
+                                errorMsg = errorData.detail || errorMsg;
+                            } catch (e) {
+                                // Ignore if response is not JSON
+                            }
+                            throw new Error(errorMsg);
+                        }
+
+                        showMessage(`Medicine "${name}" deleted successfully!`);
+                        await refreshList();
+                    } catch (error) {
+                        showMessage(`Error deleting medicine: ${error.message}`, 'error');
                     }
-                    throw new Error(errorMsg);
                 }
 
-                showMessage(`Medicine "${name}" deleted successfully!`);
-                await refreshList();
-            } catch (error) {
-                showMessage(`Error deleting medicine: ${error.message}`, 'error');
-            }
-        }
+                // Handle form submission
+                document.getElementById('medicineForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-        // Handle form submission
-        document.getElementById('medicineForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+                    const nameField = document.getElementById('f_name');
+                    const typeField = document.getElementById('f_type');
+                    const activeIngredientField = document.getElementById('f_active_ingredient');
+                    const priceField = document.getElementById('f_price');
+                    const priorityField = document.getElementById('f_priority');
 
-            const nameField = document.getElementById('f_name');
-            const typeField = document.getElementById('f_type');
-            const activeIngredientField = document.getElementById('f_active_ingredient');
-            const priceField = document.getElementById('f_price');
-            const priorityField = document.getElementById('f_priority');
+                    const name = nameField.value.trim();
+                    const type = typeField.value.trim();
+                    const active_ingredient = activeIngredientField.value.trim();
+                    const priceStr = priceField.value.trim().replace(/[^0-9.]/g, ''); // Sanitize to only numbers and decimals
+                    const priority = priorityField.value.trim();
 
-            const name = nameField.value.trim();
-            const type = typeField.value.trim();
-            const active_ingredient = activeIngredientField.value.trim();
-            const priceStr = priceField.value.trim().replace(/[^0-9.]/g, ''); // Sanitize to only numbers and decimals
-            const priority = priorityField.value.trim();
+                    let isValid = true;
 
-            let isValid = true;
+                    // Reset all highlights
+                    ['f_name', 'f_type', 'f_active_ingredient', 'f_price', 'f_priority'].forEach(id => highlightField(id, true));
 
-            // Reset all highlights
-            ['f_name', 'f_type', 'f_active_ingredient', 'f_price', 'f_priority'].forEach(id => highlightField(id, true));
+                    if (!name) {
+                        showMessage('Medicine Name is a required field.', 'error');
+                        highlightField('f_name', false);
+                        isValid = false;
+                    }
 
-            if (!name) {
-                showMessage('Medicine Name is a required field.', 'error');
-                highlightField('f_name', false);
-                isValid = false;
-            }
+                    if (!type) {
+                        showMessage('Type is a required field.', 'error');
+                        highlightField('f_type', false);
+                        isValid = false;
+                    }
 
-            if (!type) {
-                showMessage('Type is a required field.', 'error');
-                highlightField('f_type', false);
-                isValid = false;
-            }
+                    if (!active_ingredient) {
+                        showMessage('Active Ingredient is a required field.', 'error');
+                        highlightField('f_active_ingredient', false);
+                        isValid = false;
+                    }
 
-            if (!active_ingredient) {
-                showMessage('Active Ingredient is a required field.', 'error');
-                highlightField('f_active_ingredient', false);
-                isValid = false;
-            }
+                    if (!priceStr || isNaN(parseFloat(priceStr))) {
+                        showMessage('Price is required and must be a valid number.', 'error');
+                        highlightField('f_price', false);
+                        isValid = false;
+                    }
 
-            if (!priceStr || isNaN(parseFloat(priceStr))) {
-                showMessage('Price is required and must be a valid number.', 'error');
-                highlightField('f_price', false);
-                isValid = false;
-            }
+                    if (priority && isNaN(parseInt(priority))) {
+                        showMessage('Priority must be a valid integer.', 'error');
+                        highlightField('f_priority', false);
+                        isValid = false;
+                    } else {
+                        highlightField('f_priority', true);
+                    }
 
-            if (priority && isNaN(parseInt(priority))) {
-                showMessage('Priority must be a valid integer.', 'error');
-                highlightField('f_priority', false);
-                isValid = false;
-            } else {
-                highlightField('f_priority', true);
-            }
+                    if (!isValid) {
+                        return;
+                    }
 
-            if (!isValid) {
-                return;
-            }
+                    const apiKey = ensureApiKey(); // Ensure API key is available
+                    if (!apiKey) {
+                        showMessage("API Key is required to perform this action.", "error");
+                        return;
+                    }
 
-            const apiKey = ensureApiKey(); // Ensure API key is available
-            if (!apiKey) {
-                showMessage("API Key is required to perform this action.", "error");
-                return;
-            }
+                    const disease = document.getElementById('diseaseSelect').value;
+                    if (!disease) {
+                        showMessage('Please select a disease first!', 'error');
+                        return;
+                    }
 
-            const disease = document.getElementById('diseaseSelect').value;
-            if (!disease) {
-                showMessage('Please select a disease first!', 'error');
-                return;
-            }
+                    const index = parseInt(document.getElementById('editIndex').value);
+                    const isEdit = index >= 0;
 
-            const index = parseInt(document.getElementById('editIndex').value);
-            const isEdit = index >= 0;
+                    // Collect form data
+                    const formData = {
+                        name: document.getElementById('f_name').value,
+                        brand: document.getElementById('f_brand').value || null,
+                        type: document.getElementById('f_type').value || null,
+                        active_ingredient: document.getElementById('f_active_ingredient').value || null,
+                        pack_size: document.getElementById('f_pack_size').value || null,
+                        price: priceStr ? parseFloat(priceStr).toString() : null,
+                        priority: parseInt(document.getElementById('f_priority').value) || 999,
+                        image_url: document.getElementById('f_image_url').value || null,
+                        application_rate: document.getElementById('f_application_rate').value || null,
+                        method: document.getElementById('f_method').value || null,
+                        frequency: document.getElementById('f_frequency').value || null,
+                        availability: document.getElementById('f_availability').value || null,
+                        note: document.getElementById('f_note').value || null
+                    };
 
-            // Collect form data
-            const formData = {
-                name: document.getElementById('f_name').value,
-                brand: document.getElementById('f_brand').value || null,
-                type: document.getElementById('f_type').value || null,
-                active_ingredient: document.getElementById('f_active_ingredient').value || null,
-                pack_size: document.getElementById('f_pack_size').value || null,
-                price: priceStr ? parseFloat(priceStr).toString() : null,
-                priority: parseInt(document.getElementById('f_priority').value) || 999,
-                image_url: document.getElementById('f_image_url').value || null,
-                application_rate: document.getElementById('f_application_rate').value || null,
-                method: document.getElementById('f_method').value || null,
-                frequency: document.getElementById('f_frequency').value || null,
-                availability: document.getElementById('f_availability').value || null,
-                note: document.getElementById('f_note').value || null
-            };
+                    try {
+                        const url = isEdit ? `${API_BASE}/medicines/${disease}/${index}` : `${API_BASE}/medicines/${disease}`;
+                        const method = isEdit ? 'PUT' : 'POST';
 
-            try {
-                const url = isEdit ? `${API_BASE}/medicines/${disease}/${index}` : `${API_BASE}/medicines/${disease}`;
-                const method = isEdit ? 'PUT' : 'POST';
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                [API_KEY_NAME]: apiKey // Pass the API key
+                            },
+                            body: JSON.stringify(formData)
+                        });
 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [API_KEY_NAME]: apiKey // Pass the API key
-                    },
-                    body: JSON.stringify(formData)
+                        if (!response.ok) {
+                            if (response.status === 403) {
+                                throw new Error("API Key is required to perform this action.");
+                            }
+                            const errorData = await response.json();
+                            throw new Error(errorData.detail || 'Failed to save medicine');
+                        }
+
+                        showMessage(`Medicine "${formData.name}" ${isEdit ? 'updated' : 'added'} successfully!`);
+                        cancelEdit();
+                        await refreshList();
+                    } catch (error) {
+                        showMessage('Error saving medicine: ' + error.message, 'error');
+                    }
                 });
 
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error("API Key is required to perform this action.");
-                    }
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Failed to save medicine');
-                }
+                // Auto-refresh when disease selection changes
+                try {
+                    const sel = document.getElementById('diseaseSelect');
+                    if (sel) sel.addEventListener('change', refreshList);
+                    else debugLog('diseaseSelect element not found during init');
+                } catch (e) { debugError('Failed to attach change listener: ' + e.message); }
 
-                showMessage(`Medicine "${formData.name}" ${isEdit ? 'updated' : 'added'} successfully!`);
-                cancelEdit();
-                await refreshList();
-            } catch (error) {
-                showMessage('Error saving medicine: ' + error.message, 'error');
+                // Initialize the page (safe call)
+                try {
+                    loadDiseases();
+                } catch (e) { debugError('loadDiseases failed at init: ' + e.message); }
+
+            } catch (e) {
+                debugError('Initialization failed: ' + (e && e.message));
             }
-        });
-
-            // Auto-refresh when disease selection changes
-            try{
-                const sel = document.getElementById('diseaseSelect');
-                if(sel) sel.addEventListener('change', refreshList);
-                else debugLog('diseaseSelect element not found during init');
-            }catch(e){ debugError('Failed to attach change listener: '+e.message); }
-
-            // Initialize the page (safe call)
-            try{
-                loadDiseases();
-            }catch(e){ debugError('loadDiseases failed at init: '+e.message); }
-
-        } catch (e) {
-            debugError('Initialization failed: ' + (e && e.message));
-        }
-    </script>
+        </script>
+    </div> <!-- .page-wrap -->
 </body>
 
 </html>
