@@ -236,7 +236,10 @@ Fix applied:
 const getApiBase = () => {
     if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') return '';
     if (window.location.origin) return window.location.origin;
-    return 'https://kodegas-paddy-api.centralindia.cloudapp.azure.com'; // fallback
+    // Fallback: prefer the current page protocol when available, otherwise default to http
+    const host = 'kodegas-paddy-api.centralindia.cloudapp.azure.com';
+    const proto = (window.location && window.location.protocol) ? window.location.protocol : 'http:';
+    return proto + '//' + host;
 };
 const API_BASE = getApiBase();
 ```
