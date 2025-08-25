@@ -132,18 +132,51 @@
 
     <script src="/static/js/api_base.js"></script>
     <script>
-        const API_KEY_NAME = "X-API-KEY";
-        const API_BASE = window.API_BASE;
-        let apiKey = sessionStorage.getItem(API_KEY_NAME);
-
-        // Load API key from session storage on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const storedKey = sessionStorage.getItem(API_KEY_NAME);
-            if (storedKey) {
-                document.getElementById('apiKeyInput').value = storedKey;
-                apiKey = storedKey;
+        // Debug box (visible on page) for environments where console is hard to access
+        (function createDebugBox(){
+            try {
+                const dbg = document.createElement('div');
+                dbg.id = 'debugBox';
+                dbg.style.cssText = 'position:fixed;right:10px;bottom:10px;max-width:380px;max-height:300px;overflow:auto;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:8px;font-size:12px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
+                const title = document.createElement('div');
+                title.textContent = 'DEBUG';
+                title.style.fontWeight = '700';
+                title.style.marginBottom = '6px';
+                dbg.appendChild(title);
+                document.body.appendChild(dbg);
+            } catch (e) {
+                console.warn('Could not create debug box', e);
             }
-        });
+        })();
+
+        function debugLog(msg){
+            try{ console.log(msg); const d=document.getElementById('debugBox'); if(d){ const p=document.createElement('div'); p.textContent = msg; d.appendChild(p); } }catch(e){}
+        }
+        function debugError(msg){
+            try{ console.error(msg); const d=document.getElementById('debugBox'); if(d){ const p=document.createElement('div'); p.textContent = 'ERROR: '+msg; p.style.color='red'; d.appendChild(p); } }catch(e){}
+        }
+
+        try {
+            const API_KEY_NAME = "X-API-KEY";
+            const API_BASE = window.API_BASE;
+            let apiKey = sessionStorage.getItem(API_KEY_NAME);
+
+            debugLog('API_BASE=' + API_BASE);
+
+            // Load API key from session storage on page load
+            document.addEventListener('DOMContentLoaded', () => {
+                try {
+                    const storedKey = sessionStorage.getItem(API_KEY_NAME);
+                    if (storedKey) {
+                        const el = document.getElementById('apiKeyInput');
+                        if (el) el.value = storedKey;
+                        apiKey = storedKey;
+                        debugLog('Loaded API key from sessionStorage');
+                    }
+                } catch (e) {
+                    debugError('DOMContentLoaded handler error: ' + e.message);
+                }
+            });
 
         function saveApiKey() {
             const inputKey = document.getElementById('apiKeyInput').value;
@@ -221,8 +254,17 @@
         // Load available diseases
         async function loadDiseases() {
             try {
-                const response = await fetch(`${API_BASE}/medicines`);
-                if (!response.ok) throw new Error('Failed to load diseases');
+                console.log('loadDiseases: trying', API_BASE + '/medicines');
+                let response;
+                try {
+                    response = await fetch(`${API_BASE}/medicines`);
+                    if (!response.ok) throw new Error('Failed to load diseases from API_BASE');
+                } catch (err) {
+                    console.warn('API_BASE fetch failed, trying relative /medicines', err);
+                    // fallback to relative path (same-origin)
+                    response = await fetch(`/medicines`);
+                    if (!response.ok) throw new Error('Failed to load diseases from relative path');
+                }
 
                 const data = await response.json();
                 const select = document.getElementById('diseaseSelect');
@@ -520,11 +562,21 @@
             }
         });
 
-        // Auto-refresh when disease selection changes
-        document.getElementById('diseaseSelect').addEventListener('change', refreshList);
+            // Auto-refresh when disease selection changes
+            try{
+                const sel = document.getElementById('diseaseSelect');
+                if(sel) sel.addEventListener('change', refreshList);
+                else debugLog('diseaseSelect element not found during init');
+            }catch(e){ debugError('Failed to attach change listener: '+e.message); }
 
-        // Initialize the page
-        loadDiseases();
+            // Initialize the page (safe call)
+            try{
+                loadDiseases();
+            }catch(e){ debugError('loadDiseases failed at init: '+e.message); }
+
+        } catch (e) {
+            debugError('Initialization failed: ' + (e && e.message));
+        }
     </script>
 </body>
 

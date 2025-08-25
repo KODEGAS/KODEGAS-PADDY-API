@@ -164,8 +164,16 @@
 
         async function loadDiseases() {
             try {
-                const response = await fetch(`${API_BASE}/crud/disease-info`);
-                if (!response.ok) throw new Error('Failed to load disease list');
+                console.log('loadDiseases: trying', API_BASE + '/crud/disease-info');
+                let response;
+                try {
+                    response = await fetch(`${API_BASE}/crud/disease-info`);
+                    if (!response.ok) throw new Error('Failed to load disease list from API_BASE');
+                } catch (err) {
+                    console.warn('API_BASE fetch failed, trying relative /crud/disease-info', err);
+                    response = await fetch(`/crud/disease-info`);
+                    if (!response.ok) throw new Error('Failed to load disease list from relative path');
+                }
 
                 const data = await response.json();
                 const select = document.getElementById('diseaseSelect');
