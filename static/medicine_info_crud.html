@@ -171,6 +171,19 @@
                 let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
                 debugLog('API_BASE=' + API_BASE);
+                // Also write the API_BASE into the visible debug box header for quick inspection
+                try {
+                    const dbg = document.getElementById('debugBox');
+                    if (dbg) {
+                        const info = document.createElement('div');
+                        info.style.fontSize = '12px';
+                        info.style.marginBottom = '6px';
+                        info.textContent = 'Computed API_BASE: ' + API_BASE;
+                        dbg.insertBefore(info, dbg.children[1] || null);
+                    }
+                } catch (e) {
+                    console.warn('Failed to write API_BASE to debug box', e);
+                }
 
                 // Load API key from session storage on page load
                 document.addEventListener('DOMContentLoaded', () => {
