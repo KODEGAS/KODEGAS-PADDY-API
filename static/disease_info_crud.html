@@ -105,7 +105,7 @@
     <script src="/static/js/api_base.js"></script>
     <script>
         // Debug box
-        (function createDebugBox(){
+        (function createDebugBox() {
             try {
                 const dbg = document.createElement('div');
                 dbg.id = 'debugBox';
@@ -121,19 +121,19 @@
             }
         })();
 
-    const API_BASE = window.API_BASE;
+        const API_BASE = window.API_BASE;
 
         try {
             // show computed API_BASE
-            try { const dbg=document.getElementById('debugBox'); if(dbg){ const info=document.createElement('div'); info.textContent='Computed API_BASE: '+API_BASE; info.style.fontSize='12px'; info.style.marginBottom='6px'; dbg.appendChild(info);} }catch(e){}
+            try { const dbg = document.getElementById('debugBox'); if (dbg) { const info = document.createElement('div'); info.textContent = 'Computed API_BASE: ' + API_BASE; info.style.fontSize = '12px'; info.style.marginBottom = '6px'; dbg.appendChild(info); } } catch (e) { }
             // override to force http for azure host
             if (window.location.hostname === 'kodegas-paddy-api.centralindia.cloudapp.azure.com') {
                 const port = window.location.port ? ':' + window.location.port : '';
                 window.API_BASE = 'http://' + window.location.hostname + port;
                 console.log('API_BASE forced to', window.API_BASE);
-                try { const dbg=document.getElementById('debugBox'); if(dbg){ const info=document.createElement('div'); info.textContent='Forced API_BASE (override): '+window.API_BASE; info.style.fontSize='12px'; info.style.marginBottom='4px'; dbg.appendChild(info);} }catch(e){}
+                try { const dbg = document.getElementById('debugBox'); if (dbg) { const info = document.createElement('div'); info.textContent = 'Forced API_BASE (override): ' + window.API_BASE; info.style.fontSize = '12px'; info.style.marginBottom = '4px'; dbg.appendChild(info); } } catch (e) { }
             }
-        } catch(e){ console.warn('API_BASE display/override failed', e); }
+        } catch (e) { console.warn('API_BASE display/override failed', e); }
         const API_KEY_NAME = "X-API-KEY";
         let apiKey = sessionStorage.getItem(API_KEY_NAME);
 
