@@ -6,7 +6,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field, validator
 from auth import get_api_key
-import tensorflow as tf
+import os
+
+# Allow skipping heavy TensorFlow/model load for local/dev runs by setting SKIP_MODEL_LOAD=1
+SKIP_MODEL = os.environ.get("SKIP_MODEL_LOAD") == "1"
+tf = None
+if not SKIP_MODEL:
+    try:
+        import tensorflow as tf
+    except Exception as e:
+        raise RuntimeError(f"TensorFlow import failed: {e}")
 import numpy as np
 from PIL import Image
 import io
@@ -156,28 +165,40 @@ def _write_disease_info_json(data: dict):
             raise HTTPException(status_code=500, detail=f"Failed to write disease info file: {str(e)}")
 
 
-try:
-    model = tf.keras.layers.TFSMLayer(MODEL_PATH, call_endpoint='serving_default')
-except Exception as e:
-    raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
+model = None
+class_names = []
+disease_info = {}
+disease_medicines = {}
+
+if not SKIP_MODEL:
+    try:
+        model = tf.keras.layers.TFSMLayer(MODEL_PATH, call_endpoint='serving_default')
+    except Exception as e:
+        raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
 
 try:
     with open(LABELS_FILE, "r") as f:
         class_names = [line.strip().split(maxsplit=1)[-1] for line in f if line.strip()]
 except Exception as e:
-    raise RuntimeError(f"Failed to load labels from {LABELS_FILE}: {e}")
+    if not SKIP_MODEL:
+        raise RuntimeError(f"Failed to load labels from {LABELS_FILE}: {e}")
+    class_names = []
 
 try:
     with open(DISEASE_INFO_FILE, "r") as f:
         disease_info = json.load(f)
 except Exception as e:
-    raise RuntimeError(f"Failed to load disease info from {DISEASE_INFO_FILE}: {e}")
+    if not SKIP_MODEL:
+        raise RuntimeError(f"Failed to load disease info from {DISEASE_INFO_FILE}: {e}")
+    disease_info = {}
 
 try:
     with open(DISEASE_MEDICINES_FILE, "r") as f:
         disease_medicines = json.load(f)
 except Exception as e:
-    raise RuntimeError(f"Failed to load medicine data from {DISEASE_MEDICINES_FILE}: {e}")
+    if not SKIP_MODEL:
+        raise RuntimeError(f"Failed to load medicine data from {DISEASE_MEDICINES_FILE}: {e}")
+    disease_medicines = {}
 
 
 
@@ -197,6 +218,8 @@ def get_classes() -> Dict[str, List[str]]:
 @app.get("/info", tags=["Model"])
 def model_info() -> Dict[str, Any]:
     try:
+        if model is None:
+            return {"model_loaded": False, "num_classes": len(class_names)}
         input_shape = model.input_shape
         output_shape = model.output_shape
         return {
@@ -231,6 +254,9 @@ async def predict(
     - Adaptive brightness adjustment (compensates for under/overexposed images)
     - Noise reduction (removes sensor noise while preserving disease features)
     """
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded in this runtime (SKIP_MODEL_LOAD=1).")
+
     try:
         # Process the uploaded image with rice-specific enhancements
         image_array, metadata = await validate_and_process_image(

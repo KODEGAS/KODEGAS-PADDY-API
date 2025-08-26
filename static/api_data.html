@@ -8,18 +8,153 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
 </head>
+<script src="js/api_base.js"></script>
 
-<body>
-    <canvas id="bg"></canvas>
-    <div class="hub-container">
-        <h1>Data Management Hub</h1>
-        <p>Select a category to manage its data.</p>
-        <div class="nav-links">
-            <a href="/static/medicine_info_crud.html" class="medicines-link">🌾 Manage Medicines</a>
-            <a href="/static/disease_info_crud.html" class="disease-info-link">🌿 Manage Disease Info</a>
+<body class="allow-page-scroll">
+    <div class="page-wrap">
+        <header>
+            <div class="brand">
+                <div style="font-size:28px">🌾</div>
+                <div>
+                    <h1>Data Hub</h1>
+                    <p style="margin:0;color:var(--muted);font-size:0.9rem">Admin tools for medicines & disease info</p>
+                </div>
+            </div>
+            <nav>
+                <a href="/static/medicine_info_crud.html">Manage Medicines</a>
+                <a class="secondary" href="/static/disease_info_crud.html">Manage Disease Info</a>
+            </nav>
+        </header>
+
+        <div class="hub-container" role="main" aria-labelledby="hub-title">
+            <h1 id="hub-title">Data Management Hub</h1>
+            <p>Select a category to manage its data.</p>
+
+            <div class="hub-grid" style="margin-top:20px" aria-hidden="false">
+                <a id="med-card" href="/static/medicine_info_crud.html" class="hub-card" aria-labelledby="med-title"
+                    aria-describedby="med-desc">
+                    <div class="hub-icon" aria-hidden="true">
+                        <!-- pill / capsule SVG -->
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true">
+                            <rect x="2" y="11" width="20" height="6" rx="3" fill="#0ea5e9" opacity="0.12" />
+                            <path
+                                d="M5.636 7.05a5 5 0 017.07 0l5.657 5.657a5 5 0 010 7.07 5 5 0 01-7.07 0L3.566 14.12a5 5 0 010-7.07z"
+                                fill="#0891b2" />
+                            <path d="M9 9l6 6" stroke="#fff" stroke-width="1.2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="hub-body">
+                        <h3 id="med-title">Manage Medicines <span class="hub-count" id="med-count"
+                                aria-live="polite">—</span></h3>
+                        <p id="med-desc" class="desc">Add, edit and review medicines mapped to diseases. Includes bulk
+                            CSV import and search.</p>
+                    </div>
+                    <div class="hub-cta" aria-hidden="true">→</div>
+                </a>
+
+                <a id="disease-card" href="/static/disease_info_crud.html" class="hub-card"
+                    aria-labelledby="disease-title" aria-describedby="disease-desc">
+                    <div class="hub-icon" aria-hidden="true">
+                        <!-- leaf / disease SVG -->
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true">
+                            <path d="M21 11c0 5-4 8-9 9-1 0-2-1-1-2 3-3 4-6 4-9 0-3-1-6-4-9-1-1 0-2 1-2 5 1 9 4 9 13z"
+                                fill="#16a34a" opacity="0.12" />
+                            <path d="M3 21c6-2 10-8 10-18" stroke="#16a34a" stroke-width="1.4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="hub-body">
+                        <h3 id="disease-title">Manage Disease Info <span class="hub-count" id="disease-count"
+                                aria-live="polite">—</span></h3>
+                        <p id="disease-desc" class="desc">Create and update disease descriptions, symptoms and
+                            recommended treatments.</p>
+                    </div>
+                    <div class="hub-cta" aria-hidden="true">→</div>
+                </a>
+            </div>
         </div>
+
+        <footer style="text-align:center;margin-top:18px;color:var(--muted);font-size:0.9rem">
+            <!-- footer intentionally left blank (copyright removed) -->
+        </footer>
     </div>
 
+    <script>
+        // subtle animated radial background for the hub page
+        (function () {
+            const canvas = document.getElementById('bg');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h, t = 0;
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            function draw() {
+                t += 0.0025;
+                const cx = w * 0.5 + Math.sin(t * 1.2) * w * 0.08;
+                const cy = h * 0.45 + Math.cos(t * 1.1) * h * 0.08;
+                const r = Math.max(w, h) * 0.8;
+                const g = ctx.createRadialGradient(cx, cy, r * 0.05, cx, cy, r);
+                g.addColorStop(0, 'rgba(14,165,233,0.08)');
+                g.addColorStop(0.5, 'rgba(22,163,74,0.06)');
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, w, h);
+                requestAnimationFrame(draw);
+            }
+            window.addEventListener('resize', resize);
+            resize();
+            requestAnimationFrame(draw);
+        })();
+    </script>
+    <script>
+        // Live counts for hub cards
+        (async function () {
+            function base(path) {
+                const api = (window.API_BASE === undefined) ? '' : window.API_BASE;
+                return (api ? api : '') + path;
+            }
+
+            const medCountEl = document.getElementById('med-count');
+            const diseaseCountEl = document.getElementById('disease-count');
+
+            try {
+                // Fetch disease info list (CRUD endpoint)
+                const dRes = await fetch(base('/crud/disease-info'));
+                if (dRes.ok) {
+                    const dJson = await dRes.json();
+                    const diseaseKeys = dJson.available_diseases || [];
+                    diseaseCountEl.textContent = diseaseKeys.length;
+                } else {
+                    diseaseCountEl.textContent = '—';
+                }
+            } catch (e) {
+                diseaseCountEl.textContent = '—';
+            }
+
+            try {
+                // Get list of diseases that have medicines
+                const mRes = await fetch(base('/medicines'));
+                if (mRes.ok) {
+                    const mJson = await mRes.json();
+                    const diseaseKeys = mJson.available_diseases || [];
+                    // Fetch counts per disease in parallel
+                    const promises = diseaseKeys.map(d => fetch(base('/medicines/' + encodeURIComponent(d))).then(r => r.ok ? r.json() : { medicines: [] }).catch(() => ({ medicines: [] })));
+                    const results = await Promise.all(promises);
+                    const total = results.reduce((acc, r) => acc + (Array.isArray(r.medicines) ? r.medicines.length : 0), 0);
+                    medCountEl.textContent = total;
+                } else {
+                    medCountEl.textContent = '—';
+                }
+            } catch (e) {
+                medCountEl.textContent = '—';
+            }
+        })();
+    </script>
 </body>
 
 </html>

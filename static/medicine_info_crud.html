@@ -9,19 +9,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
+<body class="allow-page-scroll">
     <div class="page-wrap">
         <header>
-            <div class="brand">
-                <div style="font-size:28px;">🌾</div>
-                <div>
-                    <h1>Medicines Manager</h1>
-                    <p>Admin — manage medicines linked to diseases</p>
-                </div>
-            </div>
+            <h1>🌿 Medicines Manager</h1>
             <nav>
                 <a href="/static/api_data.html">Data Hub</a>
-                <a class="secondary" href="/static/disease_info_crud.html">Manage Disease Info</a>
+                <a href="/static/disease_info_crud.html">Manage Diseases</a>
             </nav>
         </header>
 
@@ -35,14 +29,13 @@
                 <button onclick="refreshList()">🔄 Refresh</button>
                 <button onclick="showAddForm()" class="edit">➕ Add New</button>
             </div>
-            <div class="controls" style="margin-top: 15px;">
-                <label for="apiKeyInput">API Key:</label>
-                <input type="password" id="apiKeyInput" placeholder="Enter API Key">
-                <button onclick="saveApiKey()">💾 Save</button>
-            </div>
-
-            <div id="messages"></div>
+            <div class="controls" style="margin-top: 15px;"></div>
+            <label for="apiKeyInput">API Key:</label>
+            <input type="password" id="apiKeyInput" placeholder="Enter API Key">
+            <button onclick="saveApiKey()">💾 Save API Key</button>
         </div>
+
+        <div id="messages"></div>
 
         <div class="container">
             <h2>📋 Existing Medicines</h2>

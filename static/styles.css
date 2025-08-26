@@ -1,3 +1,72 @@
+/* ------------------------------------------------------------------
+   Viewport-fit rules: make pages fill the viewport and avoid unnecessary
+   page-level scrolling by using internal scroll areas for long lists.
+------------------------------------------------------------------ */
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* ensure we can align content to viewport */
+}
+
+.page-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 40px);
+    /* leave a little room for safe area */
+    padding-bottom: 12px;
+}
+
+/* Make main hub occupy remaining space and allow internal scrolling */
+.hub-container {
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: calc(100vh - 140px);
+    /* header + footer buffer */
+    overflow: auto;
+    /* scroll inside the hub when content is tall */
+    padding: 18px 12px;
+}
+
+/* Keep the grid from stretching the page; let it wrap and scroll inside */
+.hub-grid {
+    align-items: start;
+}
+
+/* For long lists (medicines), allow internal scrolling instead of page scroll */
+#medicinesList {
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    padding-right: 6px;
+    /* room for scrollbar */
+}
+
+/* Reduce large margins that can push content off-screen on small devices */
+footer {
+    margin-top: 10px;
+    padding: 10px 4px;
+}
+
+@media (max-width: 520px) {
+    .page-wrap {
+        min-height: calc(100vh - 24px);
+    }
+
+    .hub-container {
+        max-height: calc(100vh - 120px);
+    }
+
+    #medicinesList {
+        max-height: calc(100vh - 220px);
+    }
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 :root {
@@ -12,6 +81,15 @@
     --danger: #ef4444;
     --glass: rgba(255, 255, 255, 0.7);
     --radius: 12px;
+    /* spacing tokens for consistent layout */
+    --outer-padding: 20px;
+    /* body padding */
+    --container-padding: 18px;
+    /* .container inner padding */
+    --header-padding: 14px 18px;
+    /* header inner padding */
+    --page-max-width: 1100px;
+    /* central wrapper max width */
 }
 
 * {
@@ -21,7 +99,7 @@
 body {
     font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, 'Helvetica Neue', Arial;
     margin: 0;
-    padding: 20px;
+    padding: var(--outer-padding);
     background: linear-gradient(180deg, #f6f9f4 0%, var(--bg) 100%);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
@@ -29,7 +107,7 @@ body {
 }
 
 .page-wrap {
-    max-width: 1100px;
+    max-width: var(--page-max-width);
     margin: 0 auto;
 }
 
@@ -39,7 +117,7 @@ header {
     align-items: center;
     justify-content: space-between;
     background: var(--card);
-    padding: 14px 18px;
+    padding: var(--header-padding);
     border-radius: var(--radius);
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
     margin-bottom: 18px;
@@ -92,7 +170,7 @@ nav a.secondary {
 
 .container {
     background: var(--card);
-    padding: 18px;
+    padding: var(--container-padding);
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
     margin-bottom: 18px;
@@ -340,6 +418,58 @@ fieldset {
         padding: 12px
     }
 
+
+    /* Pages that explicitly opt-out of viewport-fitting can add .allow-page-scroll
+   to the <body> to use normal document flow and scrolling. Useful for admin
+   pages with long forms or lists that should scroll the page normally. */
+    body.allow-page-scroll {
+        display: block;
+        min-height: auto;
+    }
+
+    /* Widen the content for admin pages that opt out of viewport-fit. Use
+   a fluid 80% width capped by the original max-width for readability. */
+    body.allow-page-scroll .page-wrap {
+        min-height: auto;
+        max-width: 80vw;
+        /* make the overall wrapper take ~80% of the viewport */
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        /* Use the global body padding (20px) rather than adding inner padding here
+       so this page's outer spacing matches `disease_info_crud.html`. */
+    }
+
+    /* Make container panels wider and centered */
+    body.allow-page-scroll .container {
+        width: 80%;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* For medicine lists, disable the small multi-column grid and render
+   items as full-width stacked cards that occupy ~80% of viewport */
+    body.allow-page-scroll #medicinesList {
+        display: block;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    body.allow-page-scroll .medicine-item {
+        width: 80%;
+        max-width: 980px;
+        margin: 12px auto;
+        /* center each medicine card */
+    }
+
+    /* Ensure forms and controls inside containers also follow the wider layout */
+    body.allow-page-scroll .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+
     header {
         flex-direction: column;
         align-items: flex-start;
@@ -378,5 +508,282 @@ fieldset {
 @media (min-width: 1600px) {
     .page-wrap {
         max-width: 1400px
+    }
+}
+
+/* Hub cards (api_data.html) */
+.hub-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* vertical centering */
+    min-height: calc(100vh - 160px);
+    /* leave room for header/footer */
+    text-align: center;
+    padding: 24px 12px;
+}
+
+.hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    width: min(920px, 100%);
+    justify-content: center;
+    /* center the grid within the container */
+}
+
+.hub-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), #fbfdff);
+    border-radius: 14px;
+    border: 1px solid rgba(2, 6, 23, 0.04);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.04);
+}
+
+.hub-card:hover,
+.hub-card:focus {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
+    border-color: rgba(14, 165, 233, 0.12);
+}
+
+.hub-card:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12), 0 18px 40px rgba(2, 6, 23, 0.08);
+}
+
+/* Stronger visible focus for keyboard users */
+.hub-card:focus-visible {
+    outline: 3px solid rgba(14, 165, 233, 0.16);
+    outline-offset: 4px;
+}
+
+/* Screen-reader only helper */
+.sr-only {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+.hub-icon {
+    font-size: 44px;
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(14, 165, 233, 0.06), rgba(22, 163, 74, 0.04));
+}
+
+.hub-body h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.05rem;
+    color: var(--text);
+}
+
+.hub-body .desc {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.hub-cta {
+    margin-left: auto;
+    font-size: 1.4rem;
+    color: var(--primary);
+}
+
+@media (max-width: 520px) {
+    .hub-card {
+        padding: 14px;
+        gap: 10px
+    }
+
+    .hub-icon {
+        font-size: 36px;
+        width: 52px;
+        height: 52px
+    }
+}
+
+.hub-count {
+    display: inline-block;
+    margin-left: 8px;
+    background: linear-gradient(180deg, #f1f8ff, #e6fbff);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
+/* ------------------------------------------------------------------
+   Responsive / mobile-first improvements
+   - fluid typography, touch targets, header/nav collapse, and tuned
+     spacing for small viewports
+------------------------------------------------------------------ */
+
+:root {
+    /* base font scaling for better legibility on small and large viewports */
+    font-size: 16px;
+}
+
+html {
+    font-size: 100%;
+}
+
+/* fluid type for headings and body using clamp() */
+body {
+    font-size: clamp(0.95rem, 1.6vw, 1rem);
+    line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.15;
+}
+
+h1 {
+    font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+}
+
+h2 {
+    font-size: clamp(1rem, 2.1vw, 1.25rem);
+}
+
+h3 {
+    font-size: clamp(0.98rem, 1.9vw, 1.05rem);
+}
+
+.page-wrap {
+    padding: clamp(12px, 2.6vw, 28px);
+}
+
+/* Make header more compact on small screens and allow wrap */
+header {
+    gap: 10px;
+    padding: 12px;
+}
+
+header .brand h1 {
+    font-size: 1.05rem;
+}
+
+/* Nav: stack on small screens and increase touch targets */
+nav {
+    gap: 8px;
+}
+
+nav a {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 720px) {
+    nav {
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        flex: 1 1 48%;
+        text-align: center;
+    }
+}
+
+/* Hub cards: stack content vertically on very small screens */
+@media (max-width: 420px) {
+    .hub-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 12px;
+    }
+
+    .hub-body .desc {
+        font-size: 0.88rem;
+    }
+
+    .hub-cta {
+        display: none;
+    }
+
+    .hub-icon {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+/* Ensure hub grid has adequate gaps on small devices */
+@media (max-width: 520px) {
+    .hub-grid {
+        gap: 12px;
+    }
+}
+
+/* Make form controls and buttons easier to tap */
+select,
+input[type="text"],
+textarea,
+button {
+    min-height: 44px;
+    /* recommended touch target */
+}
+
+/* Reduce heavy shadows on phones for battery/perf */
+@media (max-width: 520px) {
+
+    .hub-card,
+    .medicine-item,
+    .container,
+    header {
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+    }
+}
+
+/* Debug box: collapse to icon-like control on very small screens */
+@media (max-width: 480px) {
+    #debugBox {
+        font-size: 12px;
+        max-height: 140px;
+        right: 8px;
+        left: auto;
+        width: 220px;
+    }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* Print friendly */
+@media print {
+    body {
+        background: #fff;
+        color: #000;
+    }
+
+    header,
+    footer,
+    #debugBox {
+        display: none !important;
+    }
+
+    .hub-card {
+        box-shadow: none;
+        border: 1px solid #eee;
     }
 }
